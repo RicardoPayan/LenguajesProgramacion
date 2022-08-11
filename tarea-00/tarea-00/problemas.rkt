@@ -22,10 +22,8 @@
 (define (find-needle ls)
  (cond
     [(empty? ls) 0]
-    [(equal? (first ls) "needle") 1]
-    [else +1 (find-needle(rest ls))]
-    
-   ))
+    [(equal? (first ls) 'needle) 1]
+    [else (+ 1 (find-needle(rest ls)))]))
 
 ;; 6.
 (define (abs x)
