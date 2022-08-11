@@ -7,18 +7,15 @@
 (define (area-circle r)
   (* pi  (* r r)))
 
-;;3
 (define (circle-properties r)
   (list (area-circle r) (* 2 pi r)))
 
-;;4
 (define (rectangle-properties rec)
   (define l (list-ref rec 0))
   (define a (list-ref rec 1))
 
   (list(* l a) (+ l l a a)) )
 
-;;5
 (define (find-needle ls)
  (cond
     [(empty? ls) 0]
@@ -35,22 +32,16 @@
   ))
 
 ;; 7.
-(define (inclis1 ls)
-  (map (lambda (i) (+ 1 i)) ls)
-)
-
+;;(define (inclis1 ls)
+ ;; ...)
+;;
 ;; 8.
 ;;(define (even? x)
 ;;  ...)
 
 ;; 9.
-(define another-add
-  (lambda (n m)
-    (cond
-      [(zero? n) m]
-      [else (add1 (another-add m (sub1 n)))]
-      )))
+;;(define another-add
+;;  (lambda (n m)
+ ;;   ...))
 
-
-
-(provide (all-defined-out))
+;;(provide (all-defined-out))
