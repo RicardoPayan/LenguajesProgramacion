@@ -23,8 +23,7 @@
  (cond
     [(empty? ls) 0]
     [(equal? (first ls) 'needle) 1]
-    [(+ 1 (find-needle(rest ls)))]
-    [else -1]))
+    [else (+ 1 (find-needle(rest ls)))]))
 
 ;; 6.
 (define (abs x)
@@ -47,7 +46,8 @@
   (lambda (n m)
     (cond
       [(zero? n) m]
-      [else (add1 (another-add m (sub1 n)))])))
+      [else (add1 (another-add m (sub1 n)))]
+      )))
 
 
 

@@ -15,7 +15,7 @@
     (check-equal? (rectangle-properties '(2 4)) '(8 12)))
   
   (test-case "find-needle"
-    (check-eqv? (find-needle '(hay needle hay)) 2)
+    (check-eqv? (find-needle '(hay needle hay)) 1)
     (check-eqv? (find-needle '(hay hay hay)) -1))
   
   (test-case "abs"
