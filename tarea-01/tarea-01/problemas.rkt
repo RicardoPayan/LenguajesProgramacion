@@ -26,5 +26,16 @@
     ;[else (cons (first ls) (insertL primero segundo (rest ls)))]))
  
 
+;;3
+(define (remv-1st simbolo list)
+  (cond
+    [(empty? list) null]
+    [(equal? (first list) simbolo) cons(rest list)]
+    [else (cons (first list) (remv-1st simbolo (rest list)) )]
+    )
+  
+
+  )
+
 
 (provide (all-defined-out))
