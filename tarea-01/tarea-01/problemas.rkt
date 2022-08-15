@@ -9,22 +9,12 @@
     [else (cons number (countdown (- number 1)))]))
 
 ;;2
-
-
 (define (insertL primero segundo ls)
-
-  
 (cond
     [(empty? ls) null ]
     [(equal? (first ls) primero) (cons segundo (cons (first ls) (insertL primero segundo (rest ls))))]
     [else (cons (first ls) (insertL primero segundo (rest ls)))]))
-   
-
-  ;(cond
-    ;[(empty? ls) null ]
-    ;[(equal? (first ls) primero) (const segundo(cons (first ls) (cons (insertL primero segundo (rest ls)) null)))]
-    ;[else (cons (first ls) (insertL primero segundo (rest ls)))]))
- 
+  
 
 ;;3
 (define (remv-1st simbolo list)
@@ -53,14 +43,12 @@
     [else (cons (cons (first ls1) (first ls2)) (zip (rest ls1) (rest ls2)))]))
 
 ;;7
-(define iter 0)
 (define (list-index-ofv elemento list)
   
   (cond
-    [(empty? list) null]
-    [(equal? (first list) elemento) iter]
-    [(+ iter 1)]
-    [else(list-index-ofv elemento (rest list))]
+    [(empty? list) -1]
+    [(equal? elemento (first list)) 0]
+    [else (+ 1 (list-index-ofv elemento (rest list)))]
     ))
 
 ;;8
