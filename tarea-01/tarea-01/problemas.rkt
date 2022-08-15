@@ -44,9 +44,13 @@
   (cond
     [(empty? list) null]
     [(p (first list)) (cons (first list) (filter p (rest list)))]
-    [else (filter p (rest list))]
+    [else (filter p (rest list))]))
+
+;;6
+(define (zip ls1 ls2)
+  (cond
+    [(or (empty? ls1) (empty? ls2)) null]
+    [else (cons (cons (first ls1) (first ls2)) (zip (rest ls1) (rest ls2)))]
     ))
-
-
 
 (provide (all-defined-out))
