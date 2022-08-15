@@ -57,7 +57,31 @@
   (cond
     [(and (empty? ls1) (empty? ls2)) null]
     [(not (empty? ls1))  (cons (first ls1) (append (rest ls1) ls2))]
-    [else (cons (first ls2) (append ls1 (rest ls2)))]
-    ))
+    [else (cons (first ls2) (append ls1 (rest ls2)))]))
+
+;;9
+(define (reverse list)
+  (cond
+    [(null? list) null]
+    [else (cons (last list) (reverse(rest list)))]))
+
+(define (reverse2 ls)
+  (cond
+    [(empty? ls) null]
+    [else (cons (reverse (rest ls)) (cons (first ls) null))]))
+
+;;10
+(define (repeat ls count)
+  (cond
+    [(equal? count 1) ls]
+    [else (append (repeat ls (- count 1)) ls)]))
+
+;;11
+(define (same-lists* ls1 ls2)
+  (cond 
+  [(and (empty? ls1) (empty? ls2)) #t]
+  [(or (empty? ls1) (empty? ls2)) #f]
+  [(equal? (first ls1) (first ls2)) (same-lists* (rest ls1) (rest ls2))]
+  [else #f]))
 
 (provide (all-defined-out))

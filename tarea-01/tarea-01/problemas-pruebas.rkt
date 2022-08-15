@@ -62,52 +62,6 @@
     (check-false (same-lists* '(a (b c) d) '(a (b) c d)))
     (check-true (same-lists* '((a) b (c d) d) '((a) b (c d) d))))
   
-  (test-case "binary->natural"
-    (check-eqv? (binary->natural '()) 0)
-    (check-eqv? (binary->natural '(0 0 1)) 4)
-    (check-eqv? (binary->natural '(0 0 1 1)) 12)
-    (check-eqv? (binary->natural '(1 1 1 1)) 15)
-    (check-eqv? (binary->natural '(1 0 1 0 1)) 21)
-    (check-eqv? (binary->natural '(1 1 1 1 1 1 1 1 1 1 1 1 1)) 8191))
-  
-  (test-case "div"
-    (check-eqv? (div 25 5) 5)
-    (check-eqv? (div 36 6) 6))
-  
-  (test-case "append-map"
-    (check-equal? (append-map countdown (countdown 5))
-                  '(5 4 3 2 1 0 4 3 2 1 0 3 2 1 0 2 1 0 1 0 0)))
-  
-  (test-case "set-difference"
-    (check-equal? (set-difference '(1 2 3 4 5) '(2 6 4 8))
-                  '(1 3 5)))
-  
-  (test-case "foldr"
-    (check-equal? (foldr cons '() '(1 2 3 4))
-                  '(1 2 3 4))
-    (check-eqv? (foldr + 0 '(1 2 3 4))
-                10)
-    (check-eqv? (foldr * 1 '(1 2 3 4))
-                24))
-  
-  (test-case "powerset"
-    (check-equal? (powerset '(3 2 1))
-                  '((3 2 1) (3 2) (3 1) (3) (2 1) (2) (1) ()))
-    (check-equal? (powerset '())
-                  '(())))
-  
-  (test-case "cartesian-product"
-    (check-equal? (cartesian-product '((5 4) (3 2 1)))
-                  '((5 3) (5 2) (5 1) (4 3) (4 2) (4 1))))
-  
-  (test-case "snowball"
-    (check-eqv? (snowball 12) 1)
-    (check-eqv? (snowball 120) 1)
-    (check-eqv? (snowball 9999) 1))
-  
-  (test-case "snowball"
-    (let ((ns (make-base-namespace)))
-      (check-equal? (eval quine ns) quine)
-      (check-equal? (eval (eval quine ns) ns) quine))))
+  )
 
 (run-tests pruebas 'verbose)
