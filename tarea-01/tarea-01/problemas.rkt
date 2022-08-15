@@ -50,7 +50,25 @@
 (define (zip ls1 ls2)
   (cond
     [(or (empty? ls1) (empty? ls2)) null]
-    [else (cons (cons (first ls1) (first ls2)) (zip (rest ls1) (rest ls2)))]
+    [else (cons (cons (first ls1) (first ls2)) (zip (rest ls1) (rest ls2)))]))
+
+;;7
+(define iter 0)
+(define (list-index-ofv elemento list)
+  
+  (cond
+    [(empty? list) null]
+    [(equal? (first list) elemento) iter]
+    [(+ iter 1)]
+    [else(list-index-ofv elemento (rest list))]
+    ))
+
+;;8
+(define (append ls1 ls2)
+
+  (cond
+    [(and (empty? ls1) (empty? ls2)) null]
+    [else  (cons ( cons(first ls1) (append (rest ls1) ls2)) (cons (first ls2) (append ls1 (rest ls2))) )]
     ))
 
 (provide (all-defined-out))
