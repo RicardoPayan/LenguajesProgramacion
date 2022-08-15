@@ -31,11 +31,14 @@
   (cond
     [(empty? list) null]
     [(equal? (first list) simbolo) cons(rest list)]
-    [else (cons (first list) (remv-1st simbolo (rest list)) )]
-    )
-  
+    [else (cons (first list) (remv-1st simbolo (rest list)) )]))
 
-  )
+;;4
+(define (map p list)
+  (cond
+    [(empty? list) null]
+    [else (cons (p (first list)) (map p (rest list)))]
+    ))
 
 
 (provide (all-defined-out))
