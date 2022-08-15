@@ -34,11 +34,19 @@
     [else (cons (first list) (remv-1st simbolo (rest list)) )]))
 
 ;;4
-(define (map p list)
+(define (map p ls)
+  (cond
+    [(empty? ls) null]
+    [else (cons (p (first ls)) (map p (rest ls)))]))
+
+;;5
+(define (filter p list)
   (cond
     [(empty? list) null]
-    [else (cons (p (first list)) (map p (rest list)))]
+    [(p (first list)) (cons (first list) (filter p (rest list)))]
+    [else (filter p (rest list))]
     ))
+
 
 
 (provide (all-defined-out))
