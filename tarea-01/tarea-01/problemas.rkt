@@ -16,7 +16,7 @@
   
 (cond
     [(empty? ls) null ]
-    [(equal? (first ls) primero) (cons (cons segundo (first ls)) (insertL primero segundo (rest ls))) ]
+    [(equal? (first ls) primero) (cons segundo (cons (first ls) (insertL primero segundo (rest ls))))]
     [else (cons (first ls) (insertL primero segundo (rest ls)))]))
    
 
@@ -68,7 +68,8 @@
 
   (cond
     [(and (empty? ls1) (empty? ls2)) null]
-    [else  (cons ( cons(first ls1) (append (rest ls1) ls2)) (cons (first ls2) (append ls1 (rest ls2))) )]
+    [(not (empty? ls1))  (cons (first ls1) (append (rest ls1) ls2))]
+    [else (cons (first ls2) (append ls1 (rest ls2)))]
     ))
 
 (provide (all-defined-out))
