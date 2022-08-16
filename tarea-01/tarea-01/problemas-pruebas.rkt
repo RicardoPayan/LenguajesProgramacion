@@ -71,6 +71,10 @@
              (check-eqv? (binary->natural '(1 0 1 0 1)) 21)
              (check-eqv? (binary->natural '(1 1 1 1 1 1 1 1 1 1 1 1 1)) 8191))
   
+  (test-case "div"
+             (check-eqv? (div 25 5) 5)
+             (check-eqv? (div 36 6) 6))
+  
   )
 
 (run-tests pruebas 'verbose)

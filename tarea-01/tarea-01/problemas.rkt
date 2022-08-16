@@ -63,7 +63,7 @@
 (define (reverse ls)
   (cond
     [(null? ls) null]
-    [else (cons (reverse (rest ls)) (list (first ls)))]))
+    [else  (append (reverse (rest ls)) (list (first ls)))]))
 
 ;;10
 (define (repeat ls count)
@@ -83,17 +83,35 @@
 (define (equivalente)
   (equal? '((w . (x . ())) y (z . ())) '((w x) y (z))))
 
-
-
 ;;13
 (define (binary->natural ls)
   (binary-helper ls 0))
-
 
 (define (binary-helper ls n)
   (cond
     [(empty? ls) 0]
     [(equal? (first ls) 1) (+ (expt 2 n) (binary-helper (rest ls) (add1 n)))]
     [else (binary-helper (rest ls) (add1 n))]))
+
+;;14
+(define (div a b)
+  (div-helper a b 1)
+  )
+
+(define (div-helper a b n)
+
+  (cond
+    [(< a b) #f]
+    [(> (* b n) a) #f]
+    [(equal? (* b n) a) n]
+    [else (div-helper a b (add1 n))]))
+
+  
+    
+
+
+
+     
+
 
 (provide (all-defined-out))
