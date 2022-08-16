@@ -60,15 +60,10 @@
     [else (cons (first ls2) (append ls1 (rest ls2)))]))
 
 ;;9
-(define (reverse list)
+(define (reverse ls)
   (cond
-    [(null? list) null]
-    [else (cons (last list) (reverse(rest list)))]))
-
-(define (reverse2 ls)
-  (cond
-    [(empty? ls) null]
-    [else (cons (reverse (rest ls)) (cons (first ls) null))]))
+    [(null? ls) null]
+    [else (cons (reverse (rest ls)) (list (first ls)))]))
 
 ;;10
 (define (repeat ls count)
@@ -83,5 +78,22 @@
   [(or (empty? ls1) (empty? ls2)) #f]
   [(equal? (first ls1) (first ls2)) (same-lists* (rest ls1) (rest ls2))]
   [else #f]))
+
+;;12
+(define (equivalente)
+  (equal? '((w . (x . ())) y (z . ())) '((w x) y (z))))
+
+
+
+;;13
+(define (binary->natural ls)
+  (binary-helper ls 0))
+
+
+(define (binary-helper ls n)
+  (cond
+    [(empty? ls) 0]
+    [(equal? (first ls) 1) (+ (expt 2 n) (binary-helper (rest ls) (add1 n)))]
+    [else (binary-helper (rest ls) (add1 n))]))
 
 (provide (all-defined-out))
