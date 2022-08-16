@@ -106,10 +106,15 @@
     [(equal? (* b n) a) n]
     [else (div-helper a b (add1 n))]))
 
-  
-    
 
+;;15
+(define (append-map p arg)
+  (cond
+    [(null? arg) null]
+    [else (append (p (first arg)) (append-map p (rest arg)))]
+  ))
 
+ 
 
      
 

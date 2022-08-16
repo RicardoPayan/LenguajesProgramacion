@@ -75,6 +75,10 @@
              (check-eqv? (div 25 5) 5)
              (check-eqv? (div 36 6) 6))
   
+  (test-case "append-map"
+             (check-equal? (append-map countdown (countdown 5))
+              '(5 4 3 2 1 0 4 3 2 1 0 3 2 1 0 2 1 0 1 0 0)))
+  
   )
 
 (run-tests pruebas 'verbose)
