@@ -111,12 +111,27 @@
 (define (append-map p arg)
   (cond
     [(null? arg) null]
-    [else (append (p (first arg)) (append-map p (rest arg)))]
+    [else (append (p (first arg)) (append-map p (rest arg)))]))
+
+;;16
+(define (set-difference s1 s2)
+  (cond
+    [(empty? s1) null]
+    [(equal? (member (first s1) s2) #f) (cons (first s1) (set-difference (rest s1) s2))]
+    [else (set-difference (rest s1) s2)]))
+
+
+;;18
+(define (powerset ls)
+  (cond
+    [(empty? ls) (list ls)]
+    [else (let ([ps (powerset (rest ls))]) (append (f (first ls) ps) ps))]))
+
+(define (f x ls)
+  (cond
+    [(null? ls) null]
+    [else (cons (cons x (first ls)) (f x (rest ls)))]
   ))
-
- 
-
-     
 
 
 (provide (all-defined-out))
