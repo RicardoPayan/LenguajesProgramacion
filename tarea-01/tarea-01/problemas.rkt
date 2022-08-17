@@ -120,6 +120,13 @@
     [(equal? (member (first s1) s2) #f) (cons (first s1) (set-difference (rest s1) s2))]
     [else (set-difference (rest s1) s2)]))
 
+;;17
+(define (foldr op n ls)
+  (cond
+   [(empty? ls) n]
+   [(equal? op cons) (foldr op (append n (list (first ls))) (rest ls))]
+   [else (foldr op (op n (first ls)) (rest ls))]))
+
 
 ;;18
 (define (powerset ls)

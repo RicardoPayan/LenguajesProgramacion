@@ -87,6 +87,13 @@
                            '((3 2 1) (3 2) (3 1) (3) (2 1) (2) (1) ()))
              (check-equal? (powerset '())
                            '(())))
+  (test-case "foldr"
+             (check-equal? (foldr cons '() '(1 2 3 4))
+                           '(1 2 3 4))
+             (check-eqv? (foldr + 0 '(1 2 3 4))
+                         10)
+             (check-eqv? (foldr * 1 '(1 2 3 4))
+                         24))
   )
 
 (run-tests pruebas 'verbose)
