@@ -140,5 +140,21 @@
     [else (cons (cons x (first ls)) (f x (rest ls)))]
   ))
 
+;;19
+(define (cartesian-product ls)
+  (cond
+    [(empty? ls) null]
+    [else (append (cartesian-helper (first (list (first ls))) (second ls)) (cartesian-product (rest  (first ls))))]
+    ))
+
+(define (cartesian-helper number lis)
+
+  (cond
+    [(empty? lis) null]
+    [else (cons (cons number (first lis)) (cartesian-helper number (rest lis)))]))
+
+
+
+
 
 (provide (all-defined-out))
