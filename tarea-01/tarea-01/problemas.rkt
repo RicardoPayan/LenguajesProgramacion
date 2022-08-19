@@ -140,21 +140,24 @@
     [else (cons (cons x (first ls)) (f x (rest ls)))]
   ))
 
-;;19
+;19
+
+;Si lee esto profe, nomas pa que sepa que estuve
+;bastantes horas con este problema
+;y se sintio bastante bien resolverlo
 (define (cartesian-product ls)
   (cond
-    [(empty? ls) null]
-    [else (append (cartesian-helper (first (list (first ls))) (second ls)) (cartesian-product (rest  (first ls))))]
+    [(empty? (first ls)) null]
+    [else (append (cartesian-helper (first (first ls)) (second ls)) (cartesian-product (list (rest (first ls)) (second ls)) ))]
     ))
 
 (define (cartesian-helper number lis)
 
   (cond
     [(empty? lis) null]
-    [else (cons (cons number (first lis)) (cartesian-helper number (rest lis)))]))
+    [else (cons (cons number (list (first lis))) (cartesian-helper number (rest lis)))]))
 
-
-
+)
 
 
 (provide (all-defined-out))
