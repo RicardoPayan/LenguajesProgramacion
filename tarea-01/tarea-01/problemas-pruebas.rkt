@@ -97,6 +97,10 @@
   (test-case "cartesian-product"
              (check-equal? (cartesian-product '((5 4) (3 2 1)))
                            '((5 3) (5 2) (5 1) (4 3) (4 2) (4 1))))
+
+  (test-case "insertL-fr"
+    (check-equal? (insertL-fr 'x 'y '(x z z x y x))
+                  '(y x z z y x y y x)))
   )
 
 (run-tests pruebas 'verbose)

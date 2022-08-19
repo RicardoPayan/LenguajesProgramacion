@@ -124,8 +124,7 @@
 (define (foldr op n ls)
   (cond
    [(empty? ls) n]
-   [(equal? op cons) (foldr op (append n (list (first ls))) (rest ls))]
-   [else (foldr op (op n (first ls)) (rest ls))]))
+   [else (op (first ls) (foldr op n (rest ls)))]))
 
 
 ;;18
@@ -144,7 +143,8 @@
 
 ;Si lee esto profe, nomas pa que sepa que estuve
 ;bastantes horas con este problema
-;y se sintio bastante bien resolverlo
+;y se sintio muy bien resolverlo
+;gracias por el hackeo.
 (define (cartesian-product ls)
   (cond
     [(empty? (first ls)) null]
@@ -157,7 +157,16 @@
     [(empty? lis) null]
     [else (cons (cons number (list (first lis))) (cartesian-helper number (rest lis)))]))
 
-)
+;20
+;insertL
+(define (insertL-fr primero segundo ls )
+  (foldr (lambda (primero* ls*)
+           (cond
+           [(equal? primero* primero) (cons segundo (cons primero ls*))]
+           [else (cons primero* ls*)]))
+         
+  '() ls ))
+
 
 
 (provide (all-defined-out))
