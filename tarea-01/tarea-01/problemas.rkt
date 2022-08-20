@@ -140,11 +140,6 @@
   ))
 
 ;19
-
-;Si lee esto profe, nomas pa que sepa que estuve
-;bastantes horas con este problema
-;y se sintio muy bien resolverlo
-;gracias por el hackeo.
 (define (cartesian-product ls)
   (cond
     [(empty? (first ls)) null]
@@ -160,13 +155,53 @@
 ;20
 ;insertL
 (define (insertL-fr primero segundo ls )
-  (foldr (lambda (primero* ls*)
-           (cond
-           [(equal? primero* primero) (cons segundo (cons primero ls*))]
-           [else (cons primero* ls*)]))
-         
-  '() ls ))
+  (foldr  (lambda (primero* ls*)
+            (cond
+              [(equal? primero primero*) (cons segundo (cons primero* ls*))]
+              [else (cons primero* ls*)]))
+          '() ls ))
 
+;filter-fr
+(define (filter-fr predicado ls)
+  (foldr (lambda (primero ls*)
+           (cond
+           [(predicado primero) (cons primero ls*)]
+           [else ls*])
+           ) '() ls))
+
+;map-fr
+(define (map-fr procedimiento ls)
+  (foldr (lambda (primero ls*)
+           [cons (procedimiento primero) ls*]
+           )'() ls))
+
+(define (map2 procedimiento ls)
+  (foldr map (map procedimiento ls) '()))
+
+;append-fr
+(define (append-fr ls1 ls2)
+  (foldr append (append ls1 ls2) '())
+  )
+
+;reverse-fr
+(define (reverse-fr ls)
+  (foldr reverse (reverse ls) '()))
+
+;binary->natural-fr
+(define (binary->natural-fr ls)
+  (foldr binary->natural (binary->natural ls) '()))
+
+;append-map-fr
+(define (append-map-fr p arg)
+  (foldr append-map (append-map p arg) '()))
+
+;set-difference-fr
+(define (set-difference-fr s1 s2)
+  (foldr set-difference (set-difference s1 s2) '()))
+
+;powerset-fr
+(define (powerset-fr ls)
+  (foldr powerset (powerset ls) '()))
 
 
 (provide (all-defined-out))

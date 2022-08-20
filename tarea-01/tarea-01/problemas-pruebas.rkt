@@ -97,10 +97,51 @@
   (test-case "cartesian-product"
              (check-equal? (cartesian-product '((5 4) (3 2 1)))
                            '((5 3) (5 2) (5 1) (4 3) (4 2) (4 1))))
-
+  
   (test-case "insertL-fr"
-    (check-equal? (insertL-fr 'x 'y '(x z z x y x))
-                  '(y x z z y x y y x)))
-  )
+             (check-equal? (insertL-fr 'x 'y '(x z z x y x))
+                           '(y x z z y x y y x)))
+
+  (test-case "filter-fr"
+    (check-equal? (filter-fr even? '(1 2 3 4 5 6))
+                  '(2 4 6)))
+
+  (test-case "map-fr"
+    (check-equal? (map2 sub1 '(1 2 3 4))
+                  '(0 1 2 3)))
+
+  (test-case "append-fr"
+    (check-equal? (append-fr '(42 120) '(1 2 3))
+                  '(42 120 1 2 3))
+    (check-equal? (append-fr '(a b c) '(cat dog))
+                  '(a b c cat dog)))
+
+  (test-case "reverse-fr"
+    (check-equal? (reverse-fr '(a 3 x))
+                  '(x 3 a)))
+
+  (test-case "binary->natural-fr"
+             (check-eqv? (binary->natural-fr '()) 0)
+             (check-eqv? (binary->natural-fr '(0 0 1)) 4)
+             (check-eqv? (binary->natural-fr '(0 0 1 1)) 12)
+             (check-eqv? (binary->natural-fr '(1 1 1 1)) 15)
+             (check-eqv? (binary->natural-fr '(1 0 1 0 1)) 21)
+             (check-eqv? (binary->natural-fr '(1 1 1 1 1 1 1 1 1 1 1 1 1)) 8191))
+
+  (test-case "append-map-fr"
+             (check-equal? (append-map-fr countdown (countdown 5))
+              '(5 4 3 2 1 0 4 3 2 1 0 3 2 1 0 2 1 0 1 0 0)))
+
+  (test-case "set-difference-fr"
+             (check-equal? (set-difference-fr '(1 2 3 4 5) '(2 6 4 8))
+                           '(1 3 5)))
+
+  (test-case "powerset-fr"
+             (check-equal? (powerset-fr '(3 2 1))
+                           '((3 2 1) (3 2) (3 1) (3) (2 1) (2) (1) ()))
+             (check-equal? (powerset '())
+                           '(())))
+  
+)
 
 (run-tests pruebas 'verbose)
