@@ -1,7 +1,11 @@
 #lang plait
 
+
+
 (define (eval [input : S-Exp]) : Number
   (interp (desugar (parse input))))
+
+
 
 ;ArithC
 (define-type ArithC
@@ -26,6 +30,7 @@
            (case (s-exp->symbol (first ls))
              [(+) (sumS (parse (second ls)) (parse (third ls)))]
              [(*) (mulS (parse (second ls)) (parse (third ls)))]
+             [(-) (minuS (parse (second ls)) (parse (third ls)))]
              [else (error 'parse "operación aritmética malformada")]))]
         [else (error 'parse "expresión aritmética malformada")]))
 
