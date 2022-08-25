@@ -39,7 +39,7 @@
                 [(-) (minuS (parse (second ls)) (parse (third ls)))]
                 [else (error 'parse "operación aritmética invalida")])]
               [else (error 'parse "operación aritmética malformada")]))]
-        [else (error 'parse "operación aritmética malformada")]))
+        [else (error 'parse "operación aritmética malformad")]))
 
 ;Interprete
 (define (interp [a : ArithC]) : Number
