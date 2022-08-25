@@ -25,14 +25,21 @@
 ;Parse
 (define (parse [s : S-Exp]) : ArithS
   (cond [(s-exp-number? s) (numS (s-exp->number s))]
-        [(s-exp-list? s)
+        [(and (s-exp-list? s) (not (equal? s `())))
          (let ([ls (s-exp->list s)])
-           (case (s-exp->symbol (first ls))
-             [(+) (sumS (parse (second ls)) (parse (third ls)))]
-             [(*) (mulS (parse (second ls)) (parse (third ls)))]
-             [(-) (minuS (parse (second ls)) (parse (third ls)))]
-             [else (error 'parse "operación aritmética malformada")]))]
-        [else (error 'parse "expresión aritmética malformada")]))
+           (cond
+             [(not (s-exp-symbol? (first ls))) (error 'parse "No es expresion valida")]
+             [(equal? (length ls) 2)
+              (case (s-exp->symbol (first ls))
+                [(-) (uminuS (parse (second ls)))])]
+             [(equal? (length ls) 3)
+              (case (s-exp->symbol (first ls))
+                [(+) (sumS (parse (second ls)) (parse (third ls)))]
+                [(*) (mulS (parse (second ls)) (parse (third ls)))]
+                [(-) (minuS (parse (second ls)) (parse (third ls)))]
+                [else (error 'parse "operación aritmética invalida")])]
+              [else (error 'parse "operación aritmética malformada")]))]
+        [else (error 'parse "operación aritmética malformada")]))
 
 ;Interprete
 (define (interp [a : ArithC]) : Number
