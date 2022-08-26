@@ -28,7 +28,7 @@
         [(and (s-exp-list? s) (not (equal? s `())))
          (let ([ls (s-exp->list s)])
            (cond
-             [(not (s-exp-symbol? (first ls))) (error 'parse "No es expresion valida")]
+             [(not (s-exp-symbol? (first ls))) (error 'parse "No es expresion valida, ya que no es simbolo valido")]
              [(equal? (length ls) 2)
               (case (s-exp->symbol (first ls))
                 [(-) (uminuS (parse (second ls)))])]
