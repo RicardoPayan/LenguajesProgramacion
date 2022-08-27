@@ -21,6 +21,7 @@
     (error 'implode "esperaba una lista de cadenas unitarias, pero recibí: ~e" ls))
   (apply string-append ls))
 
+;Problema 3
 (define (take ls n)
   (cond
     [(or (equal? n 0) (empty? ls)) null]
@@ -40,5 +41,24 @@
     [else
      (cons (implode (take s n))
            (bundle (drop s n) n))]))
+
+;Problema 6
+(define (list->chunks ls n)
+  (cond
+    [(empty? ls) null]
+    [else (cons (take ls n) (list->chunks (drop ls n) n))]))
+
+(define (bundle-chunk s n)
+ (cond
+   [(or (null? s) (or (zero? n) (< n 0))) s]
+   [else (let add ([ls (list->chunks s n)])
+           (cond
+             [(empty? ls) null]
+             [else (cons (implode (first ls)) (add (rest ls)))]))]))
+
+(define (partition s n)
+  (cond
+    [(or (null? s) (or (zero? n) (< n 0))) s]
+    [else (bundle (explode s) n)]))
 
 (provide (all-defined-out))
