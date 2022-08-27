@@ -24,14 +24,14 @@
 (define (take ls n)
   (cond
     [(< (length ls) n) null]
-    [ (equal? n 0) rest ls]
+    [ (equal? n 0) null]
     [else (cons (first ls) (take (rest ls) (sub1 n)))]
   ))
 
 (define (drop ls n)
   (cond
     [(< (length ls) n) null]
-    [ (equal? n 0) rest ls]
+    [ (equal? n 0) null]
     [else (list-tail ls n)]
   ))
 
