@@ -29,7 +29,11 @@
              (check-equal? (bundle '("a" "b") -1)
                            (list "a" "b"))) ;No deberia modificar la lista
   (test-case "String vacio"
-             (check-exn exn:fail? (thunk (bundle '("") 3))) 
-))
+             (check-exn exn:fail? (thunk (bundle '("") 3))))
+
+
+  (test-case "partition vs bundle"
+             (equal? (partition "abcd" 2) (bundle (explode "abcd") 2)))
+  )
 
 (run-tests pruebas 'verbose)
