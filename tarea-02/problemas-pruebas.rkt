@@ -29,10 +29,7 @@
              (check-equal? (bundle '("a" "b") -1)
                            (list "a" "b"))) ;No deberia modificar la lista
   (test-case "String vacio"
-             (check-equal? (bundle '("") 3)
-                           '())) ;Lo trataremos igual que una lista vacia
-             
-
-  )
+             (check-exn exn:fail? (thunk (bundle '("") 3))) 
+))
 
 (run-tests pruebas 'verbose)

@@ -23,22 +23,22 @@
 
 (define (take ls n)
   (cond
-    [(< (length ls) n) null]
-    [ (equal? n 0) null]
+    [(or (equal? n 0) (empty? ls)) null]
     [else (cons (first ls) (take (rest ls) (sub1 n)))]
   ))
 
 (define (drop ls n)
   (cond
-    [(< (length ls) n) null]
-    [ (equal? n 0) null]
-    [else (list-tail ls n)]
+    [(or (equal? n 0) (empty? ls)) ls]
+    [else (drop (rest ls) (sub1 n))]
   ))
 
 
 (define (bundle s n)
   (cond
-    [(null? s) null]
+    [(or (null? s) (or (zero? n) (< n 0))) s]
     [else
      (cons (implode (take s n))
            (bundle (drop s n) n))]))
+
+(provide (all-defined-out))
