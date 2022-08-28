@@ -34,6 +34,14 @@
 
   (test-case "partition vs bundle"
              (equal? (partition "abcd" 2) (bundle (explode "abcd") 2)))
+  
+  (test-case "isort"
+             (equal? (isort '(#\z #\c #\b #\a #\e) char<=?) (list #\a #\b #\c #\e #\z))
+             (equal? (isort '(3 4 1 7 34) <) '(1 3 4 7 34))
+             (equal? (isort '("z" "Apple" "queen" "sexy") string<=?) (list "Apple" "queen" "sexy" "z"))
+             (equal? (isort '(#"b" #"a" #"c") bytes<?) (list #"a" #"b" #"c"))
+             (equal? (isort (list 'b 'a 'c) symbol<?) (list 'a 'b 'c))
+             (equal? (isort (list '#:b '#:a '#:c) keyword<?) (list '#:a '#:b '#:c)))
   )
 
 (run-tests pruebas 'verbose)

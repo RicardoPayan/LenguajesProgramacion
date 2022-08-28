@@ -63,18 +63,18 @@
     [else (bundle (explode s) n)]))
 
 ;Problema 8
-(define (isort ls p)
+(define (isort ls predicado)
   (if (empty? ls)
       null
       (insert (first ls)
-              (isort (rest ls) p) p)))
+              (isort (rest ls) predicado) predicado)))
  
 
-(define (insert n ls p)
+(define (insert n ls predicado)
   (cond
     [(empty? ls) (list n)]
-    [(p n (first ls)) (cons n ls)]
-    [else (cons (first ls) (insert n (rest ls) p))]))
+    [(predicado n (first ls)) (cons n ls)]
+    [else (cons (first ls) (insert n (rest ls) predicado))]))
 
 
 
