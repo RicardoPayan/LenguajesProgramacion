@@ -56,9 +56,27 @@
              [(empty? ls) null]
              [else (cons (implode (first ls)) (add (rest ls)))]))]))
 
+;Problema 7
 (define (partition s n)
   (cond
     [(or (null? s) (or (zero? n) (< n 0))) s]
     [else (bundle (explode s) n)]))
+
+;Problema 8
+(define (isort ls p)
+  (if (empty? ls)
+      null
+      (insert (first ls)
+              (isort (rest ls) p) p)))
+ 
+
+(define (insert n ls p)
+  (cond
+    [(empty? ls) (list n)]
+    [(p n (first ls)) (cons n ls)]
+    [else (cons (first ls) (insert n (rest ls) p))]))
+
+
+
 
 (provide (all-defined-out))
