@@ -1,4 +1,6 @@
 #lang racket
+(require racket/trace)
+
 
 (define (unit-string? x)
   (and (string? x)
@@ -75,6 +77,33 @@
     [(empty? ls) (list n)]
     [(predicado n (first ls)) (cons n ls)]
     [else (cons (first ls) (insert n (rest ls) predicado))]))
+
+;Problema 10
+
+(define (smallers ls pivot)
+  (cond
+    [(empty? ls) null]
+    [(<= (first ls) pivot) (cons (first ls) (smallers (rest ls) pivot))]
+    [else (smallers (rest ls) pivot)]))
+
+(trace-define (largers ls pivot)
+  (cond
+    [(empty? ls) null]
+    [(>= (first ls) pivot) (cons (first ls) (largers (rest ls) pivot))]
+    [else (largers (rest ls) pivot)]))
+
+(define (quicksort ls)
+  (cond
+    [(empty? ls) null]
+    [else
+     (cond
+       [(> (length ls) 2) (define pivot (/ (+ (first ls) (+ (list-ref ls (- (length ls) 1)) (list-ref ls (- (length ls) (0.5))))) 3))]
+       )
+     (append (quicksort (smallers ls pivot))
+             (list pivot)
+             (quicksort (largers ls pivot)))]))
+
+
 
 
 
