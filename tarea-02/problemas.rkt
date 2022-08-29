@@ -83,25 +83,28 @@
 (define (smallers ls pivot)
   (cond
     [(empty? ls) null]
-    [(<= (first ls) pivot) (cons (first ls) (smallers (rest ls) pivot))]
+    [(< (first ls) (first pivot)) (append (list (first ls)) (smallers (rest ls) pivot))]
     [else (smallers (rest ls) pivot)]))
 
-(trace-define (largers ls pivot)
+(define (largers ls pivot)
   (cond
     [(empty? ls) null]
-    [(>= (first ls) pivot) (cons (first ls) (largers (rest ls) pivot))]
+    [(> (first ls) (first pivot)) (append (list (first ls)) (largers (rest ls) pivot))]
     [else (largers (rest ls) pivot)]))
 
-(define (quicksort ls)
+(define (same ls pivot)
+  (cond
+    [(empty? ls) null]
+    [(equal? (first ls) pivot) (cons (first ls) (same (rest ls) pivot))]
+    [else (same (rest ls) pivot)]
+    ))
+
+(define (quicksort ls )
   (cond
     [(empty? ls) null]
     [else
-     (cond
-       [(> (length ls) 2) (define pivot (/ (+ (first ls) (+ (list-ref ls (- (length ls) 1)) (list-ref ls (- (length ls) (0.5))))) 3))]
-       )
-     (append (quicksort (smallers ls pivot))
-             (list pivot)
-             (quicksort (largers ls pivot)))]))
+     (define pivot (same ls (first ls)))
+     (append (quicksort (smallers ls pivot)) (list pivot) (quicksort (largers ls pivot)))]))
 
 
 
