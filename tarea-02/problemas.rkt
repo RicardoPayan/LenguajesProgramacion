@@ -78,24 +78,13 @@
     [(predicado n (first ls)) (cons n ls)]
     [else (cons (first ls) (insert n (rest ls) predicado))]))
 
-;Problema 10
+;Problema 10-15
 
-(define (smallers ls pivot predicado)
-  (cond
-    [(empty? ls) null]
-    [(predicado (first ls) pivot) (append (list (first ls)) (smallers (rest ls) pivot predicado))]
-    [else (smallers (rest ls) pivot predicado)]))
-
-(define (largers ls pivot predicado)
-  (cond
-    [(empty? ls) null]
-    [(and (not ( predicado (first ls) pivot)) (not (equal? (first ls) pivot)) ) (append (list (first ls)) (largers (rest ls) pivot predicado))]
-    [else (largers (rest ls) pivot predicado)]))
 
 (define (same ls pivot)
   (cond
     [(empty? ls) null]
-    [(equal? (first ls) pivot) (cons (first ls) (same (rest ls) pivot))]
+    [(filter (equal? (first ls) pivot) ls) (cons (first ls) (same (rest ls) pivot))]
     [else (same (rest ls) pivot)]))
 
 (define (quicksort ls predicado)
@@ -105,6 +94,8 @@
     [(< (length ls) 100) (isort ls predicado)]
     [else
      (define pivot (first ls))
+     (define smallers (filter (lambda (x) (predicado x pivot) ls)))
+     (define largers (filter (lambda (x) (filter (and (not (predicado x pivot)) (not (equal? x pivot))) ) ls)))
      (append (quicksort (smallers ls pivot predicado) predicado) (same ls pivot) (quicksort (largers ls pivot predicado) predicado))]))
 
 

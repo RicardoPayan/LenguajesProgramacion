@@ -42,6 +42,12 @@
              (equal? (isort '(#"b" #"a" #"c") bytes<?) (list #"a" #"b" #"c"))
              (equal? (isort (list 'b 'a 'c) symbol<?) (list 'a 'b 'c))
              (equal? (isort (list '#:b '#:a '#:c) keyword<?) (list '#:a '#:b '#:c)))
+  
+  (test-case "quicksort"
+             (equal?  (quicksort '("z" "Apple" "queen" "sexy") string<?) (list "Apple" "queen" "sexy" "z") )
+             (equal? (quicksort (list 'b 'a 'c) symbol<?) (list 'a 'b 'c))
+             (equal? (quicksort '(1 2 3 5 2 5 7 9) >) '(9 7 5 5 3 2 2 1))
+             (equal? (quicksort '(1 2 3 5 2 5 7 9) <) '(1 2 2 3 5 5 7 9)))
   )
 
 (run-tests pruebas 'verbose)
