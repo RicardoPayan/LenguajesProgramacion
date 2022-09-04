@@ -80,31 +80,32 @@
 
 ;Problema 10
 
-(define (smallers ls pivot)
+(define (smallers ls pivot predicado)
   (cond
     [(empty? ls) null]
-    [(< (first ls) (first pivot)) (append (list (first ls)) (smallers (rest ls) pivot))]
-    [else (smallers (rest ls) pivot)]))
+    [(predicado (first ls) pivot) (append (list (first ls)) (smallers (rest ls) pivot predicado))]
+    [else (smallers (rest ls) pivot predicado)]))
 
-(define (largers ls pivot)
+(define (largers ls pivot predicado)
   (cond
     [(empty? ls) null]
-    [(> (first ls) (first pivot)) (append (list (first ls)) (largers (rest ls) pivot))]
-    [else (largers (rest ls) pivot)]))
+    [(and (not ( predicado (first ls) pivot)) (not (equal? (first ls) pivot)) ) (append (list (first ls)) (largers (rest ls) pivot predicado))]
+    [else (largers (rest ls) pivot predicado)]))
 
 (define (same ls pivot)
   (cond
     [(empty? ls) null]
     [(equal? (first ls) pivot) (cons (first ls) (same (rest ls) pivot))]
-    [else (same (rest ls) pivot)]
-    ))
+    [else (same (rest ls) pivot)]))
 
-(define (quicksort ls )
+(define (quicksort ls predicado)
+  (unless (procedure? predicado) (error 'quicksort "Esperaba un predicado valido, recibi ~e" predicado))
   (cond
     [(empty? ls) null]
+    [(< (length ls) 100) (isort ls predicado)]
     [else
-     (define pivot (same ls (first ls)))
-     (append (quicksort (smallers ls pivot)) (list pivot) (quicksort (largers ls pivot)))]))
+     (define pivot (first ls))
+     (append (quicksort (smallers ls pivot predicado) predicado) (same ls pivot) (quicksort (largers ls pivot predicado) predicado))]))
 
 
 
