@@ -47,10 +47,13 @@
 ;bundle: (list-of-symbol?), integer? -> list
 (define (bundle s n)
   (cond
-    [(or (null? s) (or (zero? n) (< n 0))) s]
-    [else
-     (cons (implode (take s n))
-           (bundle (drop s n) n))]))
+    [(and (> n 0) (list? s))
+    (cond
+      [(or (null? s) (or (zero? n) (< n 0))) s]
+      [else
+       (cons (implode (take s n))
+             (bundle (drop s n) n))])]
+     [else (error 'bundle "n es menor que cero o no pasaste una lista")]))
 
 ;Problema 6
 
