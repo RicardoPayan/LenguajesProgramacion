@@ -1,0 +1,416 @@
+\documentclass{article}
+%
+% Demo of the mcode package from 
+% http://www.mathworks.co.uk/matlabcentral/fileexchange/8015-m-code-latex-package
+% Updated 06 Mar 2014
+%
+
+% load package with ``framed'' and ``numbered'' option.
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    language=lisp,
+    basicstyle=\ttfamily\small,
+    aboveskip={1.0\baselineskip},
+    belowskip={1.0\baselineskip},
+    columns=fixed,
+    extendedchars=true,
+    breaklines=true,
+    tabsize=4,
+    prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+    frame=lines,
+    showtabs=false,
+    showspaces=false,
+    showstringspaces=false,
+    keywordstyle=\color[rgb]{0.627,0.126,0.941},
+    commentstyle=\color[rgb]{0.133,0.545,0.133},
+    stringstyle=\color[rgb]{01,0,0},
+    numbers=left,
+    numberstyle=\small,
+    stepnumber=1,
+    numbersep=10pt,
+    captionpos=t,
+    escapeinside={\%*}{*)}
+}
+
+\lstset{style=mystyle}
+
+% something NOT relevant to the usage of the package.
+\usepackage{url}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{18pt}
+\title{\texttt{Tarea 02} : El Despegue }
+\author{Ricardo Payan}
+% //////////////////////////////////////////////////
+
+\begin{document}
+
+\maketitle
+
+\section*{Problema 5.}
+
+
+Si tomamos en cuenta que la finalidad de bundle es juntar strings en un grupos de n cantidad es algo absurdo tratar de juntarlos en grupos de cero. A final esta función funciona como una división y dividir entre 0 es imposible. No creo que sea un buen uso de la función, pero considero que es una prueba interesante.
+
+(bundle ‘(”a” “b” “c”) 0)
+
+Devuelve la misma lista  ‘(”a” “b” “c”). Al ser imposible dividir lo que sea en trozos de 0, entonces decidí que esto simplemente no afectara la lista en mi implementación.
+
+\section*{Problema 9.}
+\includegraphics[scale=0.3]{images/problema9.jpg}
+
+\section*{Problema 11.}
+Si la entrada a quicksort contiene varias repeticiones de un número, va a regresar
+una lista estrictamente más corta que la entrada. Responde el por qué y arregla el problema.
+
+Por que los métodos largers y smallers solo agregan los elementos que son estrictamente mayores y menores al pivote respectivamente. En algun punto del ciclo de recursion, el pivote repetido ya estará dentro de la lista y por eso no lo agregara, ya que nuestro algoritmo actual no sabe que hacer con números que son iguales.
+
+Mi solución fue hacer un tercer método llamado “same” que recibe una lista y un pivote.
+
+
+\begin{lstlisting}
+(define (same ls pivot)
+  (cond
+    [(empty? ls) null]
+    [(equal? (first ls) pivot) (cons (first ls) (same (rest ls) pivot))]
+    [else (same (rest ls) pivot)]))
+\end{lstlisting}
+
+Esta función filtra los elementos de $ls$ que son iguales al $pivot$ y los agrega a una nueva lista. Entonces modificados la función $Quicksort$ para que se unan las tres listas.
+
+\begin{lstlisting}
+(define (quicksort ls )
+  (cond
+    [(empty? ls) null]
+    [else
+     (define pivot (first ls))
+     (append (quicksort (smallers ls pivot)) (same ls pivot) (quicksort (largers ls pivot)))]))
+\end{lstlisting}
+
+\section*{Problema 12.}
+Modifica $quicksort$ para ordenar listas con valores de cualquier tipo en cualquier
+orden aceptando un argumento adicional.
+
+
+Para resolver este problema implemente la misma idea del problema 8 para el $isort$, agregando un predicado como argumento adicional extra.
+
+\begin{lstlisting}
+    ;Problema 8
+(define (isort ls predicado)
+  (if (empty? ls)
+      null
+      (insert (first ls)
+              (isort (rest ls) predicado) predicado)))
+\end{lstlisting}
+
+Por supuesto, al modificar $Quicksort$, necesariamente necesite modificar los métodos $largers$ y $smallers$; Ya que estos métodos son los que comparan los valores de la lista. El método same se deja igual ya que siempre se usa el mismo comparador.
+
+Al querer modificar $largers$ y $smallers$ me encontré con el primer subproblema a resolver: Pasando el mismo predicado, ¿Cómo se hace para que uno haga lo contrario al otro?
+
+La solución fue dejar le método $smallers$ como el “base”, ósea, haría exactamente lo que el predicado indique.
+
+\begin{lstlisting}
+(define (smallers ls pivot predicado)
+    (cond
+    [(empty? ls) null]
+    [(predicado (first ls) pivot) (append (list (first ls)) (smallers (rest ls) pivot predicado))]
+    [else (smallers (rest ls) pivot predicado)]))
+\end{lstlisting}
+
+El metodo largers haria lo contrario a lo que el predicado indique, para eso nos apoyamos con el $not$.
+
+\begin{lstlisting}
+(define (largers ls pivot predicado)
+  (cond
+    [(empty? ls) null]
+    [(and (not ( predicado (first ls) pivot)) (not (equal? (first ls) pivot)) ) (append (list (first ls)) (largers (rest ls) pivot predicado))]
+    [else (largers (rest ls) pivot predicado)]))
+\end{lstlisting}
+
+En la primer versión no había agregado la segunda condición:
+
+\begin{lstlisting}
+    not (equal? (first ls) pivot))
+\end{lstlisting}
+
+Y eso hacia mi ejecución llenara la memoria, entre rascarle y quemarse un poco la cabeza al final me di cuenta que el pivot tampoco debia ser igual a elemento que estabamos comparando, ya que eso se haría en el método same.
+
+\begin{lstlisting}
+(define (same ls pivot)
+  (cond
+    [(empty? ls) null]
+    [(equal? (first ls) pivot) (cons (first ls) (same (rest ls) pivot))]
+    [else (same (rest ls) pivot)]))
+\end{lstlisting}
+
+Entonces, al final le agregamos un filtro al metodo quicksort para que solo se ejecute cuando el argumento predicado sea un procedimiento.
+
+\begin{lstlisting}
+(define (quicksort ls predicado)
+  (unless (procedure? predicado) (error quicksort "Esperaba un predicado valido, recibi ~e" predicado))
+  (cond
+    [(empty? ls) null]
+    [else
+     (define pivot (first ls))
+     (append (quicksort (smallers ls pivot predicado) predicado) (same ls pivot) (quicksort (largers ls pivot predicado) predicado))]))
+\end{lstlisting}
+
+Algunas pruebas:
+
+\begin{lstlisting}
+> (quicksort '("z" "Apple" "queen" "sexy") string<?)
+	'("Apple" "queen" "sexy" "z")
+
+> (quicksort (list 'b 'a 'c) symbol<?)
+	'(a b c)
+
+> (quicksort '(#"b" #"a" #"c") bytes<?)
+		'(#"a" #"b" #"c")
+
+> (quicksort '(1 2 3 5 2 5 7 9) >)
+	'(9 7 5 5 3 2 2 1)
+
+> (quicksort '(1 2 3 5 2 5 7 9) <)
+		'(1 2 2 3 5 5 7 9)
+
+> (quicksort '(1 2 3 5 2 5 7 9) 6)
+. . quicksort: Esperaba un predicado valido, recibi 6
+\end{lstlisting}
+
+\section*{Problema 13.}
+Implementa una versión de quicksort que utilice isort si la longitud de la entrada está
+por debajo de un umbral. Determina este umbral utilizando la función time, escribe el procedimiento
+que seguiste para encontrar este umbral.
+
+Para hacer este prueba use las funciones $shuffle$ y $build-list$. A este ultima le pase una cantidad $n$ de elementos.
+
+\begin{lstlisting}
+    ;n = 10,000
+> (time (quicksort (shuffle (build-list 10000 values)) >))
+		cpu time: 93 real time: 75 gc time: 31
+
+> (time (isort (shuffle (build-list 10000 values)) >))
+		cpu time: 5125 real time: 5252 gc time: 343
+\end{lstlisting}
+
+En esta primer prueba podemos notar una diferencia importante de tiempo, siendo quicksort el algoritmo mas rapido. Ahora lo probaremos con $n = 1000$.
+
+\begin{lstlisting}
+    ;n = 1000
+> (time (quicksort (shuffle (build-list 1000 values)) >))
+		cpu time: 0 real time: 5 gc time: 0
+
+> (time (isort (shuffle (build-list 1000 values)) >))
+	cpu time: 46 real time: 49 gc time: 15
+\end{lstlisting}
+
+Ahora le diferencia es menor, pero Quicksort sigue siendo mucho mas rápido. Hagamos otra prueba bajando el umbral a 100.
+
+\begin{lstlisting}
+    ;n = 100
+> (time (quicksort (shuffle (build-list 100 values)) >))
+		cpu time: 0 real time: 0 gc time: 0
+
+> (time (isort (shuffle (build-list 100 values)) >))
+		cpu time: 0 real time: 0 gc time: 0
+\end{lstlisting}
+
+Vemos que no hay diferencia cuando $n = 100$, así que podemos considerar ese el umbral.
+
+Agregamos están condición a Quicksort.
+
+
+\begin{lstlisting}
+(define (quicksort ls predicado)
+  (unless (procedure? predicado) (error quicksort "Esperaba un predicado valido, recibi ~e" predicado))
+  (cond
+    [(empty? ls) null]
+    [(< (length ls) 100) (isort ls predicado)]
+    [else
+     (define pivot (first ls))
+     (append (quicksort (smallers ls pivot predicado) predicado) (same ls pivot) (quicksort (largers ls pivot predicado) predicado))]))
+
+
+> (time (quicksort '(4 6 5 1 9) >))
+		cpu time: 0 real time: 0 gc time: 0
+		'(9 6 5 4 1)
+\end{lstlisting}
+
+\section*{Problema 14.}
+Utiliza filter para definir smallers y largers.
+
+Si tomamos en cuenta que la forma del $filter$ es:
+
+\begin{lstlisting}
+    (filter pred lst) -> list?
+
+  pred : procedure?
+  lst : list?
+\end{lstlisting}
+
+Es fácil implementarlo, el $pred$ del $filter$ serian las condiciones que ya habíamos definido.
+
+\begin{lstlisting}
+(define (smallers ls pivot predicado)
+  (cond
+    [(empty? ls) null]
+    [(filter (predicado (first ls) pivot) ls) (append (list (first ls)) (smallers (rest ls) pivot predicado))]
+    [else (smallers (rest ls) pivot predicado)]))
+
+(define (largers ls pivot predicado)
+  (cond
+    [(empty? ls) null]
+    [(filter (and (not ( predicado (first ls) pivot)) (not (equal? (first ls) pivot))) ls) (append (list (first ls)) (largers (rest ls) pivot predicado))]
+    [else (largers (rest ls) pivot predicado)]))
+
+(define (same ls pivot)
+  (cond
+    [(empty? ls) null]
+    [(filter (equal? (first ls) pivot) ls) (cons (first ls) (same (rest ls) pivot))]
+    [else (same (rest ls) pivot)]))
+\end{lstlisting}
+
+\section*{Problema 15.}
+Implementa smallers y largers como procedimientos locales internos en Quicksort.
+
+Para esto tenemos que usar funciones anónimas dentro de Quicksort, ósea $lambda$; Lo cual, siendo muy sincero, me sigue pareciendo arte de magia. Creo que me acostumbre a como funciona lambda en vez de entenderlo del todo, cada vez que tengo que usarlo le tengo pego una releída la documentación. Con cada una lo entiendo un poco mas, espero…
+
+Entonces definimos $smallers$ y $largers$.
+
+\begin{lstlisting}
+(define (quicksort ls predicado)
+  (unless (procedure? predicado) (error quicksort "Esperaba un predicado valido, recibi ~e" predicado))
+  (cond
+    [(empty? ls) null]
+    [(< (length ls) 100) (isort ls predicado)]
+    [else
+     (define pivot (first ls))
+     (define smallers (filter (lambda (x) (predicado x pivot) ls)))
+     (define largers (filter (lambda (x) (filter (and (not (predicado x pivot)) (not (equal? x pivot))) ) ls)))
+     
+     (append (quicksort (smallers ls pivot predicado) predicado) 
+     (same ls pivot) 
+     (quicksort (largers ls pivot predicado) predicado))]))
+\end{lstlisting}
+
+También podría definir $same$ dentro del Quicksort, pero eso lo dejamos como ejercicio para el lector.
+
+\section*{Problema 18.}
+Considera la siguiente definición de smallers, uno de los procedimientos utilizados
+en quicksort, responde en qué puede fallar al utilizar esta versión modificada en el procedimiento
+de ordenamiento.
+
+\begin{lstlisting}
+    (define (smallers l n)
+	(cond
+		[(empty? l) '()]
+		[else (if (<= (first l) n)
+				(cons (first l) (smallers (rest l) n))
+				(smallers (rest l) n))]))
+\end{lstlisting}
+
+Fallaria porque usa el comparador $<=$ y el algoritmo de quicksort solo funciona cuando los elementos son estrictamente menores, estrictamente mayores o estrictamente iguales al pivote. De hecho, cuando en alguno de mis intenttos para que el quicksort añadiera los elementos que son iguales al pivote hice exactamente lo mismo que esta definicion de smallers. Se me ciclo el algoritmo.
+
+\section*{Problema 19.}
+Describe con tus propias palabras cómo funciona find-largest-divisor de gcd-
+structural. Responde por qué comienza desde (min n m).
+
+\begin{lstlisting}
+    (define (gcd-structural n m)
+	(define (find-largest-divisor k)
+	(cond [(= i 1) 1]
+		[(= (remainder n i) (remainder m i) 0) i]
+		[else (find-largest-divisor (- k 1))]))
+(find-largest-divisor (min n m)))
+\end{lstlisting}
+
+Basicamente, el algoritmo toma dos numeros y busca otro que divida a $n$ y $m$ sin dejar residuo. 
+
+Si $i = 1$, el algoritmo se detiene ya que ese es el caso base de GDC. Todos los numeros enteros se pueden divir entre $1$ sin dejar residuo.
+
+SI no es el caso, verificamos si el residuo de $n$ y $m$ entre $i$ es igual a cero; si es el caso, significa que i es un comun divisor.
+
+Si no, continuamos el algoritmo restanda una unidad a $k$.
+
+Empezamos con el minimo de los numeros porque si tratamos de dividir un numero mas chico entre uno mas grande, siempre habra residuo, entonces no tiene sentido empezarlo desde el mas grande.
+
+
+\section*{Problema 20.}
+Describe con tus propias palabras cómo funciona find-largest-divisor de gcd-
+generative.
+
+\begin{lstlisting}
+    (define (gcd-generative n m)
+	(define (find-largest-divisor max min)
+		(if (= min 0)
+		max
+		(find-largest-divisor min (remainder max min))))
+	(find-largest-divisor (max n m) (min n m)))
+\end{lstlisting}
+
+Esto me parece el algoritmo de euclides. Estamos pasando dos numeros enteros y encontramos sus maximo comun divisor.
+
+En algortimo de euclides decimos que si el minimo entre los dos numeros es igual a cero, entonces devolvemos el minimo.
+
+Sabemos que el maximo comun divisor entre dos numeros es igual al maximo comun divisor del menor y el residuo del mayor entre el menor.
+
+$mcd(a,0) = 0$
+
+$mcd(a,b)=mcd(b, a mod b)$
+
+Entonces, la funcion se seguira llamando a si misma hasta que encuentre el GDC.
+
+\section*{Problema 21.}
+Utiliza la función time para determinar cuál de las dos implementaciones es más
+eficiente, escribiendo tu respuesta con los tiempos de ejecución obtenidos con ambos procedimientos
+para valores “pequeños”, “medianos” y “grandes”. Justifica qué valores usaste en cada una de estas
+mediciones y por qué los consideraste de ese “tamaño”.
+
+\begin{lstlisting}
+    ;valores pequeños
+>(time (gcd-structural 100 150))
+		cpu time: 0 real time: 0 gc time: 0
+		50
+
+> (time (gcd-generative 100 150))
+		cpu time: 0 real time: 0 gc time: 0
+		50
+
+  ;valores medianos
+> (time (gcd-generative 1000 1500))
+		cpu time: 0 real time: 0 gc time: 0
+		500
+
+> (time (gcd-structural 1000 1500))
+		cpu time: 0 real time: 0 gc time: 0
+		500
+
+
+  ;valores grandes
+>(time (gcd-structural 100000 150000))
+		cpu time: 8 real time: 8 gc time: 2
+		50000
+
+> (time (gcd-generative 100000 150000))
+    cpu time: 0 real time: 0 gc time: 0
+    50000
+\end{lstlisting}
+
+Podemos notar que empieza a ver diferencias entre los dos algoritmos cuando cruzamos el umbral de cientos de miles. Sinceramente, la selección de estos valores fue un poco albitrari. Al tanteo como se le dice normalmente.
+
+\section*{Problema 22.}
+Piensa y describe por qué no siempre es la mejor opción elegir el procedimiento más
+eficiente en tiempo de ejecución. Utiliza criterios que no sean el de “eficiencia”.
+
+En la seccion 2.3 hablamos de lo importante que es poder explicar nuestros algoritmos; para esa seccion utilizamos firmas.
+Tal vez se dio cuenta profesor que entendi mucho menos el algoritmo $ gcd-generative $ a comparacion de $gcd-structural$ y esto es en gran medida por la forma en que funcionan los algoritmos y como estan escritos. A pesar de que los dos hagan lo mismo me es mas complicado explicar y entender uno que el otro.
+Con los tiempos, podemos ver que $gcd-generative$ es mas rapido, pero tampoco es una diferencia enorme. Entonces considero que en casos como estos es mejor la opcion que sea mas facil de entender y leer.
+
+\end{document}
+
