@@ -19,15 +19,14 @@
              (check-equal? (bundle '() 3)
                            '()))
   (test-case "Trozo igual a cero"
-             (check-equal? (bundle '("a" "b") 0)
-                           (list "a" "b"))) ;No deberia modificar la lista
+             (check-exn exn:fail? (thunk (bundle '("a" "b") 0))))
+                           ;No deberia modificar la lista
   
   (test-case "Lista vacia y trozo igual a cero"
-             (check-equal? (bundle '() 0)
-                           '()))
+             (check-exn exn:fail? (thunk (bundle '() 0))))
   (test-case "Trozo negativo"
-             (check-equal? (bundle '("a" "b") -1)
-                           (list "a" "b"))) ;No deberia modificar la lista
+             (check-exn exn:fail? (thunk (bundle '("a" "b") -1))))
+  
   (test-case "String vacio"
              (check-exn exn:fail? (thunk (bundle '("") 3))))
 

@@ -119,7 +119,20 @@
      (append (quicksort (smallers ls pivot predicado) predicado) (same ls pivot) (quicksort (largers ls pivot predicado) predicado))]))
 
 
+;Problema 21
+(define (gcd-structural n m)
+  (define (find-largest-divisor k)
+    (cond [(= k 1) 1]
+          [(= (remainder n k) (remainder m k) 0) k]
+          [else (find-largest-divisor (- k 1))]))
+  (find-largest-divisor (min n m)))
 
+(define (gcd-generative n m)
+  (define (find-largest-divisor max min)
+    (if (= min 0)
+        max
+        (find-largest-divisor min (remainder max min))))
+  (find-largest-divisor (max n m) (min n m)))
 
 
 
