@@ -1,5 +1,7 @@
 #lang racket
-(require racket/trace)
+(require pict
+         pict/color)
+(require racket/draw)
 
 ;unit-string?: string? -> boolean
 (define (unit-string? x)
@@ -135,5 +137,38 @@
   (find-largest-divisor (max n m) (min n m)))
 
 
+;el pilon
+(define (triangle side width color)
+  (define w side)
+  (define h (* side (sin (/ pi 3))))
+  (define (draw-it ctx dx dy)
+    (define prev-pen (send ctx get-pen))
+    (define path (new dc-path%))
+    (send ctx set-pen (new pen% [width width] [color color]))
+    (send path move-to 0 h)
+    (send path line-to w h)
+    (send path line-to (/ w 2) 0)
+    (send path close)
+    (send ctx draw-path path dx dy)
+    (send ctx set-pen prev-pen))
+  (dc draw-it w h))
+
+
+
+(define (sierpinski side)
+  (cond [(<= side 4) (triangle side 1 "red")]
+        [else
+         (define half (sierpinski (/ side 2)))
+         (vc-append half (hc-append half half))]))
+
+;Fractal de triangulos rectangulos invertidos, hechos de cuadrados.
+;La verdad, salio mientras jugaba con pict.
+;Me gusto porque la gran figura final es un triangulo rectangulo con una orientacion,
+;pero los pequeños triangulos tienen la orientacion contraria
+(define (triangleOfRectangles w h)
+  (cond [(or (<= w 10) (<= h 10)) (filled-rectangle w h #:color "red")]
+        [else
+         (define half (triangleOfRectangles (/ w 2) (/ h 2)))
+         (ht-append half (vc-append half half ))]))
 
 (provide (all-defined-out))
