@@ -1,7 +1,7 @@
 #lang plait
 
 (define (eval [str : S-Exp]) : Value
-  (interp (desugar (parse str))))
+  (interp (desugar (parse str)) empty-env))
 
 
 ;Definicion de tipos-----------------
@@ -32,7 +32,7 @@
   (numS [n : Number])
   (strS [s : String])
   (boolS [b : Boolean])
-  (idS [name : Symbol])
+  (idS [name : Symbol] )
   (binopS [op : Operator] [left : ExprS] [right : ExprS]) 
   (ifS [a : ExprS] [b : ExprS] [c : ExprS])
   (andS [left : ExprS] [right : ExprS])
@@ -40,6 +40,30 @@
   (funS [name : Symbol] [body : ExprS])
   (letS [name : Symbol] [value : ExprS] [body : ExprS])
   (appS [func : ExprS][arg : ExprS]) )
+
+(define (unbound-identifier-error [name : Symbol])
+  (error 'interp
+         (string-append
+          "unbound identifier: "
+          (to-string name))))
+
+(define-type Binding
+  (binding [name : Symbol]
+           [value : Value]))
+
+(define-type-alias Environment (Listof Binding))
+
+(define empty-env empty)
+
+(define (lookup-env name env)
+  (if (empty? env)
+      (unbound-identifier-error name)
+      (if (eq? name (binding-name (first env)))
+          (binding-value (first env))
+          (lookup-env name (rest env)))))
+
+(define (extend-env name value env)
+  (cons (binding name value) env))
 
 ;---Desugar-----------
 
@@ -53,39 +77,54 @@
     [(binopS op e2 e3) (binopC op (desugar e2) (desugar e3))]
     [(andS e1 e2) (ifC (desugar e1) (desugar e2) (boolC #f))]
     [(orS e1 e2) (ifC (desugar e1) (boolC #t) (desugar e2))]
-    [(funS name body) (numC 0)]
+    [(funS name body) (funC name (desugar body))]
     [(letS name value body) (numC 0)]
-    [(appS fun arg) (numC 0)]))
+    [(appS fun arg) (appC (desugar fun) (desugar arg))]))
 
 
 ;---Interprete
-(define (interp [e : ExprC]) : Value
-   (interp-helper e))
+(define (interp [e : ExprC] [env : Environment]) : Value
+   (interp-helper e env))
 
-(define (interp-helper [e : ExprC]) : Value
+(define (interp-helper [e : ExprC] [env : Environment]) : Value
   (type-case ExprC e
     [(numC n) (numV n)]
     [(boolC b) (boolV b)]
     [(strC s) (strV s)]
-    [(idC name) (numV 0)]
+    [(idC name) (lookup-env name env)]
     [(ifC a b c)
-     (let ([v1 (interp-helper a)])
+     (let ([v1 (interp-helper a env)])
        (cond
          [(not (boolV? v1))
           (bad-conditional-error v1)]
-         [(boolV-value v1) (interp-helper b)]
-         [else (interp-helper c)]))]
+         [(boolV-value v1) (interp-helper b env)]
+         [else (interp-helper c env)]))]
     [(binopC op left right)
-             (let ([left (interp-helper left)])
-               (let ([right (interp-helper right)])
+             (let ([left (interp-helper left env)])
+               (let ([right (interp-helper right env)])
                  (interp-binop op left right)))]
     [(funC name body) (numV 0)]
-    [(appC func arg) (numV 0)]))
+    [(appC func arg)
+     (let ([v1 (interp-helper func env)])
+       (cond
+         [(not (funC? v1))
+          (bad-app-error v1)]
+         [else (interp-helper arg env)]))]))
+
+
+
+;---Mensajes de error---------
 
 (define (bad-conditional-error [v : Value])
   (error 'interp
          (string-append
           "Condicional mal formado para IF expression: "
+          (to-string v))))
+
+(define (bad-app-error [v : Value])
+  (error 'interp
+         (string-append
+          "Aplicacion mal formada, el valor no es una funcion: "
           (to-string v))))
 
 
