@@ -6,10 +6,16 @@
 
 ;Definicion de tipos-----------------
 (define-type Value
-  (numV [n : Number])
-  (strV [s : String])
-  (boolV [b : Boolean])
+  (numV [value : Number])
+  (strV [value : String])
+  (boolV [value : Boolean])
   (funV [param : Symbol] [body : ExprC]))
+
+(define-type Operator
+  (plus0)
+  (append0)
+  (numeq0)
+  (streq0))
 
 (define-type ExprC
   (numC [n : Number])
@@ -17,13 +23,10 @@
   (boolC [b : Boolean])
   (idC [name : Symbol])
   (ifC [a : ExprC] [b : ExprC] [c : ExprC])
-  (binopC [op : Operator] [left : ExprC] [right : ExprC]))
+  (binopC [op : Operator] [left : ExprC] [right : ExprC])
+  (funC [name : Symbol] [body : ExprC])
+  (appC [func : ExprC] [arg : ExprC]))
 
-(define-type Operator
-  (plus0)
-  (append0)
-  (numeq0)
-  (streq0))
 
 (define-type ExprS
   (numS [n : Number])
@@ -36,7 +39,7 @@
   (orS [left : ExprS] [right : ExprS])
   (funS [name : Symbol] [body : ExprS])
   (letS [name : Symbol] [value : ExprS] [body : ExprS])
-  (appS [fun : ExprS][arg : ExprS]) )
+  (appS [func : ExprS][arg : ExprS]) )
 
 ;---Desugar-----------
 
@@ -48,7 +51,7 @@
     [(idS name) (idC name)]
     [(ifS a b c) (ifC (desugar a) (desugar b) (desugar c))]
     [(binopS op e2 e3) (binopC op (desugar e2) (desugar e3))]
-    [(andS e1 e2) (ifC (desugar e1) (desugar e2) (boolC #t))]
+    [(andS e1 e2) (ifC (desugar e1) (desugar e2) (boolC #f))]
     [(orS e1 e2) (ifC (desugar e1) (boolC #t) (desugar e2))]
     [(funS name body) (numC 0)]
     [(letS name value body) (numC 0)]
@@ -65,26 +68,68 @@
     [(boolC b) (boolV b)]
     [(strC s) (strV s)]
     [(idC name) (numV 0)]
-    [(ifC a b c) (numV 0)]
+    [(ifC a b c)
+     (let ([v1 (interp-helper a)])
+       (cond
+         [(not (boolV? v1))
+          (bad-conditional-error v1)]
+         [(boolV-value v1) (interp-helper b)]
+         [else (interp-helper c)]))]
     [(binopC op left right)
              (let ([left (interp-helper left)])
                (let ([right (interp-helper right)])
-                 (interp-binop op left right)))]))
+                 (interp-binop op left right)))]
+    [(funC name body) (numV 0)]
+    [(appC func arg) (numV 0)]))
+
+(define (bad-conditional-error [v : Value])
+  (error 'interp
+         (string-append
+          "Condicional mal formado para IF expression: "
+          (to-string v))))
+
 
 (define (interp-binop [op : Operator]
                       [left : Value]
                       [right : Value]) : Value
   (type-case Operator op
     [(plus0)
-     (if (numV? left)
-         (if (numV? right)
-         (numV (+ (numV-n left)
-                  (numV-n right)))
-         (error 'binop "El izquierdo no es numero"))
-     (error 'binop "El derecho no es numero"))]
-    [(append0) (numV 0)]
-    [(numeq0) (numV 0)]
-    [(streq0) (numV 0)]))   
+     (cond
+       [(boolV? left) (error 'binop "No se pueden sumar booleanos")]
+       [(boolV? right) (error 'binop "No se pueden sumar booleanos")]
+       [else (cond
+       [(numV? left)
+        (cond
+          [(numV? right)
+           (numV (+ (numV-value left) (numV-value right)))]
+          [else (error 'binop "El derecho no es numero")])]
+       [else (error 'binop "El izquierdo no es numero")])])]
+    [(append0)
+     (cond
+       [(strV? left)
+        (cond
+          [(strV? right)
+           (strV (string-append (strV-value left) (strV-value right)))]
+          [else (error 'binop "El derecho no es un string")])]
+       [else (error 'binop "El izquierdo no es un string")])]
+    [(numeq0)
+     (cond
+       [(numV? left)
+        (cond
+          [(numV? right)
+           (boolV (= (numV-value left) (numV-value right)))]
+          [else (error 'binop "El derecho no es un numero")])]
+       [else (error 'binop "El izquierdo no es un numero")])]
+    [(streq0)
+     (cond
+       [(strV? left)
+        (cond
+          [(strV? right)
+           (boolV (string=? (strV-value left) (strV-value right)))]
+          [else (error 'binop "El derecho no es un string")])]
+       [else (error 'binop "El izquierdo no es un string")])]))
+     
+     
 
 
 
