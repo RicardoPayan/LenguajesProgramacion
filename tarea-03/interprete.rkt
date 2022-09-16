@@ -8,26 +8,83 @@
 (define-type Value
   (numV [n : Number])
   (strV [s : String])
-  (boolV [b : Boolean]))
+  (boolV [b : Boolean])
+  (funV [param : Symbol] [body : ExprC]))
 
+(define-type ExprC
+  (numC [n : Number])
+  (strC [s : String])
+  (boolC [b : Boolean])
+  (idC [name : Symbol])
+  (ifC [a : ExprC] [b : ExprC] [c : ExprC])
+  (binopC [op : Operator] [left : ExprC] [right : ExprC]))
+
+(define-type Operator
+  (plus0)
+  (append0)
+  (numeq0)
+  (streq0))
 
 (define-type ExprS
   (numS [n : Number])
   (strS [s : String])
   (boolS [b : Boolean])
   (idS [name : Symbol])
-  (pluS [left : ExprS] [right : ExprS]) ;Pendiente a modificar para que funcione con binopS
+  (binopS [op : Operator] [left : ExprS] [right : ExprS]) 
   (ifS [a : ExprS] [b : ExprS] [c : ExprS])
   (andS [left : ExprS] [right : ExprS])
   (orS [left : ExprS] [right : ExprS])
   (funS [name : Symbol] [body : ExprS])
-  (letS [name : Symbol] [body : ExprS]))
+  (letS [name : Symbol] [value : ExprS] [body : ExprS])
+  (appS [fun : ExprS][arg : ExprS]) )
 
-;-----------------------------------
+;---Desugar-----------
+
+(define (desugar [e : ExprS]) : ExprC
+  (type-case ExprS e
+    [(numS n) (numC n)]
+    [(boolS b) (boolC b)]
+    [(strS s) (strC s)]
+    [(idS name) (idC name)]
+    [(ifS a b c) (ifC (desugar a) (desugar b) (desugar c))]
+    [(binopS op e2 e3) (binopC op (desugar e2) (desugar e3))]
+    [(andS e1 e2) (ifC (desugar e1) (desugar e2) (boolC #t))]
+    [(orS e1 e2) (ifC (desugar e1) (boolC #t) (desugar e2))]
+    [(funS name body) (numC 0)]
+    [(letS name value body) (numC 0)]
+    [(appS fun arg) (numC 0)]))
 
 
+;---Interprete
+(define (interp [e : ExprC]) : Value
+   (interp-helper e))
 
+(define (interp-helper [e : ExprC]) : Value
+  (type-case ExprC e
+    [(numC n) (numV n)]
+    [(boolC b) (boolV b)]
+    [(strC s) (strV s)]
+    [(idC name) (numV 0)]
+    [(ifC a b c) (numV 0)]
+    [(binopC op left right)
+             (let ([left (interp-helper left)])
+               (let ([right (interp-helper right)])
+                 (interp-binop op left right)))]))
 
+(define (interp-binop [op : Operator]
+                      [left : Value]
+                      [right : Value]) : Value
+  (type-case Operator op
+    [(plus0)
+     (if (numV? left)
+         (if (numV? right)
+         (numV (+ (numV-n left)
+                  (numV-n right)))
+         (error 'binop "El izquierdo no es numero"))
+     (error 'binop "El derecho no es numero"))]
+    [(append0) (numV 0)]
+    [(numeq0) (numV 0)]
+    [(streq0) (numV 0)]))   
 
 
 
@@ -101,25 +158,25 @@
 (define (parse-+ in)
   (let ([inlst (s-exp->list in)])
     (if (equal? (length inlst) 3)
-        (binopS (plusO) (parse (second inlst)) (parse (third inlst)))
+        (binopS (plus0) (parse (second inlst)) (parse (third inlst)))
         (error 'parse "cantidad incorrecta de argumentos para +"))))
 
 (define (parse-++ in)
   (let ([inlst (s-exp->list in)])
     (if (equal? (length inlst) 3)
-        (binopS (appendO) (parse (second inlst)) (parse (third inlst)))
+        (binopS (append0) (parse (second inlst)) (parse (third inlst)))
         (error 'parse "cantidad incorrecta de argumentos para ++"))))
 
 (define (parse-num= in)
   (let ([inlst (s-exp->list in)])
     (if (equal? (length inlst) 3)
-        (binopS (numeqO) (parse (second inlst)) (parse (third inlst)))
+        (binopS (numeq0) (parse (second inlst)) (parse (third inlst)))
         (error 'parse "cantidad incorrecta de argumentos para num="))))
 
 (define (parse-str= in)
   (let ([inlst (s-exp->list in)])
     (if (equal? (length inlst) 3)
-        (binopS (streqO) (parse (second inlst)) (parse (third inlst)))
+        (binopS (streq0) (parse (second inlst)) (parse (third inlst)))
         (error 'parse "cantidad incorrecta de argumentos para str="))))
 
 (define (parse-fun in)
