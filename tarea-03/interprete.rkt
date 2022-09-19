@@ -44,7 +44,7 @@
 (define (unbound-identifier-error [name : Symbol])
   (error 'interp
          (string-append
-          "unbound identifier: "
+          "identificador no está enlazado  "
 
           (to-string name))))
 
@@ -78,8 +78,8 @@
     [(idS name) (idC name)]
     [(ifS a b c) (ifC (desugar a) (desugar b) (desugar c))]
     [(binopS op e2 e3) (binopC op (desugar e2) (desugar e3))]
-    [(andS e1 e2) (ifC (desugar e1) (desugar e2) (boolC #f))]
-    [(orS e1 e2) (ifC (desugar e1) (boolC #t) (desugar e2))]
+    [(andS left right) (ifC (desugar left) (ifC (desugar right) (boolC #t) (boolC #f)) (boolC #f))]
+    [(orS left right) (ifC (desugar left) (boolC #t) (ifC (desugar right) (boolC #t) (boolC #f)))]
     [(funS name body) (funC name (desugar body))]
     [(letS name value body) (appC (funC name (desugar body)) (desugar value))]
     [(appS fun arg) (appC (desugar fun) (desugar arg))]))
@@ -112,7 +112,8 @@
        (cond
          [(not (funV? v1))
           (bad-app-error v1)]
-         [else (interp-helper arg env)]))]))
+         [else (let ([nenv (cons (binding (funV-param v1) (interp arg env)) env)])
+                 (interp-helper (funV-body v1) nenv))]))]))
 
 
 (define (interp-binop [op : Operator]
@@ -136,8 +137,8 @@
         (cond
           [(strV? right)
            (strV (string-append (strV-value left) (strV-value right)))]
-          [else (error 'binop "El derecho no es un string")])]
-       [else (error 'binop "El izquierdo no es un string")])]
+          [else (error 'binop "El derecho no es un string, argumento incorrecto")])]
+       [else (error 'binop "El izquierdo no es un string, argumento incorrecto")])]
     [(numeq0)
      (cond
        [(numV? left)
@@ -162,13 +163,13 @@
 (define (bad-conditional-error [v : Value])
   (error 'interp
          (string-append
-          "Condicional mal formado para IF expression: "
+          "no es un valor booleano"
           (to-string v))))
 
 (define (bad-app-error [v : Value])
   (error 'interp
          (string-append
-          "Aplicacion mal formada, el valor no es una funcion: "
+          "identicador no es una función"
           (to-string v))))
 
 
