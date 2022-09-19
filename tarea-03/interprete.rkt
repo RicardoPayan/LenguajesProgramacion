@@ -45,8 +45,11 @@
   (error 'interp
          (string-append
           "unbound identifier: "
+
           (to-string name))))
 
+
+;---Environment---------------
 (define-type Binding
   (binding [name : Symbol]
            [value : Value]))
@@ -65,7 +68,7 @@
 (define (extend-env name value env)
   (cons (binding name value) env))
 
-;---Desugar-----------
+;---Desugar------------------------
 
 (define (desugar [e : ExprS]) : ExprC
   (type-case ExprS e
@@ -78,11 +81,11 @@
     [(andS e1 e2) (ifC (desugar e1) (desugar e2) (boolC #f))]
     [(orS e1 e2) (ifC (desugar e1) (boolC #t) (desugar e2))]
     [(funS name body) (funC name (desugar body))]
-    [(letS name value body) (numC 0)]
+    [(letS name value body) (appC (funC name (desugar body)) (desugar value))]
     [(appS fun arg) (appC (desugar fun) (desugar arg))]))
 
 
-;---Interprete
+;---Interprete-----------
 (define (interp [e : ExprC] [env : Environment]) : Value
    (interp-helper e env))
 
@@ -103,29 +106,13 @@
              (let ([left (interp-helper left env)])
                (let ([right (interp-helper right env)])
                  (interp-binop op left right)))]
-    [(funC name body) (numV 0)]
+    [(funC name body) (funV name body)]
     [(appC func arg)
      (let ([v1 (interp-helper func env)])
        (cond
-         [(not (funC? v1))
+         [(not (funV? v1))
           (bad-app-error v1)]
          [else (interp-helper arg env)]))]))
-
-
-
-;---Mensajes de error---------
-
-(define (bad-conditional-error [v : Value])
-  (error 'interp
-         (string-append
-          "Condicional mal formado para IF expression: "
-          (to-string v))))
-
-(define (bad-app-error [v : Value])
-  (error 'interp
-         (string-append
-          "Aplicacion mal formada, el valor no es una funcion: "
-          (to-string v))))
 
 
 (define (interp-binop [op : Operator]
@@ -141,8 +128,8 @@
         (cond
           [(numV? right)
            (numV (+ (numV-value left) (numV-value right)))]
-          [else (error 'binop "El derecho no es numero")])]
-       [else (error 'binop "El izquierdo no es numero")])])]
+          [else (error 'binop "El derecho no es numero, argumento incorrecto")])]
+       [else (error 'binop "El izquierdo no es numero, argumento incorrecto")])])]
     [(append0)
      (cond
        [(strV? left)
@@ -167,16 +154,27 @@
            (boolV (string=? (strV-value left) (strV-value right)))]
           [else (error 'binop "El derecho no es un string")])]
        [else (error 'binop "El izquierdo no es un string")])]))
+
+
+
+;---Mensajes de error---------
+
+(define (bad-conditional-error [v : Value])
+  (error 'interp
+         (string-append
+          "Condicional mal formado para IF expression: "
+          (to-string v))))
+
+(define (bad-app-error [v : Value])
+  (error 'interp
+         (string-append
+          "Aplicacion mal formada, el valor no es una funcion: "
+          (to-string v))))
+
+
+
      
-     
-
-
-
-
-
-
-
-;PARSE
+;----Parse---------
 (define (parse [in : S-Exp]) : ExprS
   (cond
     [(s-exp-number? in)
