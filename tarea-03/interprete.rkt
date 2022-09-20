@@ -1,7 +1,7 @@
 #lang plait
 
 (define (eval [str : S-Exp]) : Value
-  (interp (desugar (parse str)) empty-env))
+  (interp (desugar (parse str))))
 
 
 ;Definicion de tipos-----------------
@@ -86,8 +86,8 @@
 
 
 ;---Interprete-----------
-(define (interp [e : ExprC] [env : Environment]) : Value
-   (interp-helper e env))
+(define (interp [e : ExprC]) : Value
+   (interp-helper e empty-env))
 
 (define (interp-helper [e : ExprC] [env : Environment]) : Value
   (type-case ExprC e
@@ -112,7 +112,7 @@
        (cond
          [(not (funV? v1))
           (bad-app-error v1)]
-         [else (let ([nenv (cons (binding (funV-param v1) (interp arg env)) env)])
+         [else (let ([nenv (cons (binding (funV-param v1) (interp-helper arg env)) env)])
                  (interp-helper (funV-body v1) nenv))]))]))
 
 
@@ -206,7 +206,8 @@
     [(s-exp-match? `{ANY ...} in)
      (parse-app in)]
     [(s-exp-symbol? in)
-     (parse-id in)]))
+     (parse-id in)]
+    [else (error 'parse "expresión malformada")]))
 
 ;Funciones para parsear valores ---------------------
 (define (parse-number in)
