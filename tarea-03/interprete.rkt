@@ -9,7 +9,7 @@
   (numV [value : Number])
   (strV [value : String])
   (boolV [value : Boolean])
-  (funV [param : Symbol] [body : ExprC]))
+  (funV [param : Symbol] [body : ExprC] [e : Environment]))
 
 (define-type Operator
   (plus0)
@@ -44,7 +44,7 @@
 (define (unbound-identifier-error [name : Symbol])
   (error 'interp
          (string-append
-          "identificador no está enlazado  "
+          "identificador no está enlazado "
 
           (to-string name))))
 
@@ -106,14 +106,14 @@
              (let ([left (interp-helper left env)])
                (let ([right (interp-helper right env)])
                  (interp-binop op left right)))]
-    [(funC name body) (funV name body)]
+    [(funC name body) (funV name body env)]
     [(appC func arg)
      (let ([v1 (interp-helper func env)])
        (cond
          [(not (funV? v1))
           (bad-app-error v1)]
-         [else (let ([nenv (cons (binding (funV-param v1) (interp-helper arg env)) env)])
-                 (interp-helper (funV-body v1) nenv))]))]))
+         [else (let ([newenv (cons (binding (funV-param v1) (interp-helper arg env)) (funV-e v1))])
+                 (interp-helper (funV-body v1) newenv))]))]))
 
 
 (define (interp-binop [op : Operator]
