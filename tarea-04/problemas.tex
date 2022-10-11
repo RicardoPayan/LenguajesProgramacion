@@ -1,0 +1,128 @@
+\documentclass{article}
+%
+% Demo of the mcode package from 
+% http://www.mathworks.co.uk/matlabcentral/fileexchange/8015-m-code-latex-package
+% Updated 06 Mar 2014
+%
+
+% load package with ``framed'' and ``numbered'' option.
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    language=lisp,
+    basicstyle=\ttfamily\small,
+    aboveskip={1.0\baselineskip},
+    belowskip={1.0\baselineskip},
+    columns=fixed,
+    extendedchars=true,
+    breaklines=true,
+    tabsize=4,
+    prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+    frame=lines,
+    showtabs=false,
+    showspaces=false,
+    showstringspaces=false,
+    keywordstyle=\color[rgb]{0.627,0.126,0.941},
+    commentstyle=\color[rgb]{0.133,0.545,0.133},
+    stringstyle=\color[rgb]{01,0,0},
+    numbers=left,
+    numberstyle=\small,
+    stepnumber=1,
+    numbersep=10pt,
+    captionpos=t,
+    escapeinside={\%*}{*)}
+}
+
+\lstset{style=mystyle}
+
+% something NOT relevant to the usage of the package.
+\usepackage{url}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{18pt}
+\title{ Problemas PROC }
+\author{Ricardo Payan}
+% //////////////////////////////////////////////////
+
+\begin{document}
+
+\maketitle
+
+\section*{Ejercicio 3.20.}
+
+
+In PROC, procedures have only one argument, but one can get the
+effect of multiple argument procedures by using procedures that return other proce-
+dures. For example, one might write code like
+
+
+\begin{lstlisting}
+let f = proc (x) proc (y) ...
+    in ((f 3) 4)
+\end{lstlisting}
+
+This trick is called Currying, and the procedure is said to be Curried. Write a Curried
+procedure that takes two arguments and returns their sum. You can write x + y in
+our language by writing $−(x, −(0, y))$.
+
+\begin{lstlisting}
+    let suma = proc(x) proc(y) (- (x , -(0 , y))
+	   in (suma 5) 5)
+\end{lstlisting}
+
+\section*{Ejercicio 3.27}
+Add a new kind of procedure called a traceproc to the language.
+A traceproc works exactly like a proc, except that it prints a trace message on
+entry and on exit.
+
+\begin{lstlisting}
+#Sintaxis concreta
+    Expression := (traceproc Identifier Expression)
+
+#Sintaxis Abstracta
+    (traceproc-exp var body)
+\end{lstlisting}
+
+\begin{lstlisting}
+#Especificacion semantica
+    (value-of (traceproc-exp var body) env)
+        = (trace (proc-val (procedure var body env)))
+\end{lstlisting}
+
+\section*{Ejercicio 3.29}
+Unfortunately, programs that use dynamic binding may be excep-
+tionally difficult to understand. For example, under lexical binding, consistently
+renaming the bound variables of a procedure can never change the behavior of a pro-
+gram: we can even remove all variables and replace them by their lexical addresses,
+as in section 3.6. But under dynamic binding, this transformation is unsafe.
+For example, under dynamic binding, the procedure $proc (z) a$ returns the value
+of the variable a in its caller’s environment. Thus, the program
+
+\begin{lstlisting}
+    let a = 3
+    in let p = proc (z) a
+        in let f = proc (x) (p 0)
+            in let a = 5
+                in (f 2)
+\end{lstlisting}
+returns 5, since a’s value at the call site is 5. What if f’s formal parameter were a?
+
+Recordando que el formal parameter se refiere la variable $var$ en $proc-exp (var, body)$.
+
+Entonces cambiamos el parametro formal de $f$ y el codigo quedaria asi.
+
+\begin{lstlisting}
+let a = 3
+    in let p = proc (z) a
+        in let f = proc (a) (p 0)
+            in let a = 5
+                in (f 2) //Aqui es la ultima vez que se le asigna valor a "a"
+\end{lstlisting}
+
+Ahora se le esta asignando el valor de 2 a la variable $a$ con la llamada del procedimiento $f$. Por lo tanto el valor que retornara este bloque de codigo es 2.
+\end{document}
