@@ -420,7 +420,7 @@ ESPECIFICACIONES SEMÁNTICAS
             [b-var (letrec-exp-b-var exp)]
             [p-body (letrec-exp-p-body exp)]
             [letrec-body (letrec-exp-letrec-body exp)])
-       (value-of letrec-body (extend-env-rec p-name b-var p-body env) st))]
+       (value-of letrec-body (extend-env-rec p-name b-var p-body env)))]
     [else
      (error 'value-of "no es una expresión: ~e" exp)]))
 
