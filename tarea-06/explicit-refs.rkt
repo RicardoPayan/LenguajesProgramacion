@@ -124,6 +124,9 @@ Expresión:
        [(if) (parse-if x)]
        [(let) (parse-let x)]
        [(proc) (parse-proc x)]
+       [(newref) (parse-newref x)]
+       [(deref) (parse-deref x)]
+       [(setref) (parse-setref x)]
        [else
         (if (and (list? x)
                  (= 2 (length x)))
@@ -404,15 +407,17 @@ ESPECIFICACIONES SEMÁNTICAS
            [arg (result-value r2)])
          (apply-procedure proc arg (result-state r2)))]
     [(newref-exp? exp)
-     (let ([this-ref (length st)]
-           [state (append st (list (result-value (value-of exp env st))))])
-       (result (ref-val this-ref) state))]
+     (let* ([this-ref (length st)]
+            [r1 (value-of (newref-exp-exp1 exp) env st)])
+       (set! the-store (append the-store
+                                (list (result-value r1))))
+       (result (ref-val this-ref) the-store))]
     [(deref-exp? exp)
-     (if (null? st)
-         (error 'the-store "referencia sin contenido asignado: ~e" exp)
-         (result (list-ref exp st) st))]
+     (let* ([r1 (value-of (deref-exp-exp1 exp) env st)])
+         (result (list-ref (result-value r1) the-store) (result-state r1)))]
     [(setref-exp? exp)
      (result setref-exp-exp (append (take st setref-exp-ref)
+                                    
                             (list (result-value (value-of setref-exp-exp env st)))
                             (drop st (+ (expval->num setref-exp-ref) 1))))]
     [(letrec-exp? exp)
