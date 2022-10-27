@@ -15,7 +15,15 @@
   (test-case "let"
              (check-equal? (run `(let [x 5] (- x 2)))
                            (result (num-val 3) '())))
-  ()
+
+  (test-case "newref"
+             (check-equal? (run `(newref 5))
+                           (result (ref-val 0) (list (num-val 5)))))
+  (test-case "deref"
+             (check-equal? (run `(let (x (newref 5)) (- (deref x) 7)))
+                           (result (num-val -2) (list (num-val 5)))))
+  
+ 
   )
 
 
