@@ -1,4 +1,3 @@
-
 #lang racket
 
 (require rackunit
@@ -22,11 +21,16 @@
   (test-case "deref"
              (check-equal? (run `(let (x (newref 5)) (- (deref x) 7)))
                            (result (num-val -2) (list (num-val 5)))))
-  
- 
+
+  (test-case "setref"
+             (check-equal? (run `(setref (newref 5) 7))
+                           (result (num-val 7) (list (num-val 7))))
+             (check-equal? (run `(let (x (newref 5))
+                                   (let (y (newref 6))
+                                     (setref x 7))))
+                           (result (num-val 7) (list (num-val 7) (num-val 6)))))
+
   )
-
-
   
 
 (run-tests test 'verbose)
