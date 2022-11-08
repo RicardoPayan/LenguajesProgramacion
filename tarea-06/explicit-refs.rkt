@@ -203,7 +203,7 @@ Expresión:
 (define (parse-setref x)
   (unless (= (length x) 3)
     (error 'parse "expresión no es válida: ~e" x))
-  ( setref-exp (parse-expression (second x))
+  (setref-exp (parse-expression (second x))
                (parse-expression (third x))))
 
 
@@ -407,19 +407,23 @@ ESPECIFICACIONES SEMÁNTICAS
            [arg (result-value r2)])
          (apply-procedure proc arg (result-state r2)))]
     [(newref-exp? exp)
-     (let* ([this-ref (length st)]
+     (let ([this-ref (length st)]
             [r1 (value-of (newref-exp-exp1 exp) env st)])
        (set! the-store (append the-store
                                 (list (result-value r1))))
        (result (ref-val this-ref) the-store))]
     [(deref-exp? exp)
-     (let* ([r1 (value-of (deref-exp-exp1 exp) env st)])
-         (result (list-ref (result-value r1) the-store) (result-state r1)))]
+     (let ([r1 (value-of (deref-exp-exp1 exp) env st)])
+         (result (list-ref the-store (expval->ref (result-value r1))) (result-state r1)))]
     [(setref-exp? exp)
-     (result setref-exp-exp (append (take st setref-exp-ref)
-                                    
-                            (list (result-value (value-of setref-exp-exp env st)))
-                            (drop st (+ (expval->num setref-exp-ref) 1))))]
+     (let* ([ref1 (expval->ref (result-value (value-of (setref-exp-ref exp) env st)))]
+            [r2 (value-of (setref-exp-exp exp) env st)])
+            (unless (or (exact-nonnegative-integer? ref1)
+                        (> (length the-store) ref1))
+              (error 'value-of "indice no válido: ~e" exp))
+            (result (result-value r2) (append (take the-store ref1)
+                                       (list (result-value r2))
+                                       (drop the-store (+ ref1 1)))))]
     [(letrec-exp? exp)
      (let* ([p-name (letrec-exp-p-body exp)]
             [b-var (letrec-exp-b-var exp)]
@@ -449,3 +453,5 @@ ESPECIFICACIONES SEMÁNTICAS
 
 (define (run sexp)
   (value-of-program (parse sexp)))
+
+(provide (all-defined-out))

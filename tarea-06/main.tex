@@ -1,0 +1,150 @@
+\documentclass{article}
+%
+% Demo of the mcode package from 
+% http://www.mathworks.co.uk/matlabcentral/fileexchange/8015-m-code-latex-package
+% Updated 06 Mar 2014
+%
+
+% load package with ``framed'' and ``numbered'' option.
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    language=lisp,
+    basicstyle=\ttfamily\small,
+    aboveskip={1.0\baselineskip},
+    belowskip={1.0\baselineskip},
+    columns=fixed,
+    extendedchars=true,
+    breaklines=true,
+    tabsize=4,
+    prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+    frame=lines,
+    showtabs=false,
+    showspaces=false,
+    showstringspaces=false,
+    keywordstyle=\color[rgb]{0.627,0.126,0.941},
+    commentstyle=\color[rgb]{0.133,0.545,0.133},
+    stringstyle=\color[rgb]{01,0,0},
+    numbers=left,
+    numberstyle=\small,
+    stepnumber=1,
+    numbersep=10pt,
+    captionpos=t,
+    escapeinside={\%*}{*)}
+}
+
+\lstset{style=mystyle}
+
+% something NOT relevant to the usage of the package.
+\usepackage{url}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{18pt}
+\title{ Problemas EXPLICIT-REFS }
+\author{Ricardo Payan}
+% //////////////////////////////////////////////////
+
+\begin{document}
+
+\maketitle
+
+\section*{Ejercicio 4.8.}
+
+
+Show exactly where in our implementation of the store these operations take linear time rather than constant time.
+
+
+
+- En newref al usar length y append hacemos que la funcion trabaje con tiempo lineal.
+
+- En deref, list-ref tiene tiempo de ejecucion lineal
+
+- En setref!, setref-inner funciona con un ciclo, asi que setref! tiene tiempo de ejecucion lineal.
+
+
+\section*{Ejercicio 4.9}
+Implement the store in constant time by representing it as a Scheme vector. What is lost by using this representation?
+
+\begin{lstlisting}
+(define (empty-store)
+	(vector))
+
+(define the-store 'uninitialized)
+
+(define (get-store)
+  the-store)
+
+(define reference?
+	(lambda (v)
+		(integer? v)))
+
+(define (extend-store store val)
+	(let* ([store-size (vector-length store)]
+				[new-store (make-vector (+ store-size 1) (vector-copy! store 0 store 0 (vector-length store)))])
+	(vector-set! new-store (vector-length (new-store) val))))
+
+(define newref val
+	(let* ([new-store-info (extend-store the-store val)]
+					[new-store (first new-store-info)]
+					[next-ref (last new-store-info)])
+		(set! the-store new-store) 
+			next-ref))
+
+(define (deref ref)
+(vector-ref the-store ref))
+
+(define (setref! ref val)
+	(cond
+	[(and (reference? ref) (< ref (vector-length the-store))) (vector-set! the-store ref val)]
+	[error 'setref! "No se puede cambiar la referencia"]))
+\end{lstlisting}
+
+
+\section*{Ejercicio 4.10}
+Implement the begin expression as speciﬁed in exercise 4.4.
+
+\begin{lstlisting}
+#Sintaxis Concreta
+    Expression := begin Expression {; Expresion }* end
+
+#Sintaxis Abstracta
+    begin-exp(exps)
+\end{lstlisting}
+
+\begin{lstlisting}
+#Implementacion
+(value-of (begin-exp (exp1 (cons exp2 null))) env) =
+	((value-of exp1 env)
+		(pair-val (cons (value-of exp2 env)
+										(null-val))))
+\end{lstlisting}
+
+\section*{Ejercicio 4.11}
+Implement list from exercise 4.5.
+
+
+
+\begin{lstlisting}
+#Sintaxis concreta 
+    Expression := list (Expression *(,))
+
+#Sintaxis Abstracta
+    list-exp(exps)
+\end{lstlisting}
+
+\begin{lstlisting}
+#Implementacion
+
+(value-of (list-exp (cons exp1 (cons exp2 null))) env) =
+	(pair-val (cons (value-of exp1 env)
+			(pair-val(cons (value-of exp2 env)
+											(null-val)))))
+\end{lstlisting}
+
+
+\end{document}
