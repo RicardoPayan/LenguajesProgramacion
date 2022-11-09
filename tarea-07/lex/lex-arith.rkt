@@ -196,6 +196,15 @@
                     (nat 7)
                     (op ^)
                     (nat 2)))
+    
+    (check-equal? (lex "5 (var x) (let)")
+                  '((nat 5)
+                    (opar #f)
+                    (var #f)
+                    (cpar #f)
+                    (opar #f)
+                    (let #f)
+                    (cpar #f)))
 
     (check-exn #rx"malformed input"
                (lambda ()
