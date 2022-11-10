@@ -1,0 +1,115 @@
+\documentclass{article}
+%
+% Demo of the mcode package from 
+% http://www.mathworks.co.uk/matlabcentral/fileexchange/8015-m-code-latex-package
+% Updated 06 Mar 2014
+%
+
+% load package with ``framed'' and ``numbered'' option.
+\usepackage[framed,numbered,autolinebreaks,useliterate]{mcode}
+\usepackage{multirow}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    language=lisp,
+    basicstyle=\ttfamily\small,
+    aboveskip={1.0\baselineskip},
+    belowskip={1.0\baselineskip},
+    columns=fixed,
+    extendedchars=true,
+    breaklines=true,
+    tabsize=4,
+    prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+    frame=lines,
+    showtabs=false,
+    showspaces=false,
+    showstringspaces=false,
+    keywordstyle=\color[rgb]{0.627,0.126,0.941},
+    commentstyle=\color[rgb]{0.133,0.545,0.133},
+    stringstyle=\color[rgb]{01,0,0},
+    numbers=left,
+    numberstyle=\small,
+    stepnumber=1,
+    numbersep=10pt,
+    captionpos=t,
+    escapeinside={\%*}{*)}
+}
+
+\lstset{style=mystyle}
+
+% something NOT relevant to the usage of the package.
+\usepackage{url}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{18pt}
+\title{ Problemas Lenguaje LET}
+\author{Ricardo Payan}
+% //////////////////////////////////////////////////
+
+\begin{document}
+
+\maketitle
+
+\section*{Especificacion del lenguaje LET}
+\begin{tabular}{| p{6cm} | p{6cm} |}
+\hline
+ \multicolumn{2}{|c|}{LET} \\
+ 
+ \hline
+    Sintaxis Concreta & Sintaxis Abstracta \\
+\hline
+$Expression := Number$ & (const-exp num) \\
+\hline
+
+\hline
+$Expression := -(Expression, Expression)$ & (diff-exp exp1 exp2) \\
+\hline
+
+\hline
+$Expression := zero?(Expression)$ & (zero?-exp exp1) \\
+\hline
+
+\hline
+$Expression :=$ $if$ $Expression$ $then$ $else$ $Expression$ & (if-exp exp1 exp2 exp3) \\
+\hline
+
+\hline
+$Expression := Identifier$ & (var-exp var) \\
+\hline
+
+\hline
+$Expression :=$ $let$ $Identifier=$ $Expression$ $in$ $Expression$ & (let-exp var exp1 body) \\
+\hline
+ 
+\end{tabular}
+
+\section*{Interpretación de expresiones}
+(value-of (const-exp $n$ ) $\rho$) = (num-val $n$)
+
+(value-of (var-exp $var$) $\rho$) = $\rho$($var$)
+
+(value-of (diff-exp $exp1$ $exp2$) $\rho$) \\
+   = (num-val (- ($expval \rightarrow num$ (value-of $exp1$ $\rho$))
+    ($expval \rightarrow num$ (value-of $exp2$ $\rho$))))
+
+    
+(value-of (zero?-exp $exp1$ $exp2$) $\rho$) \\
+    = (let ([$val1$ (value-of $exp1$ $\rho$)])
+    (value-of $exp3$ $\rho$)
+    (value-of $exp3$ ))
+
+(value-of (if-exp $exp1$ $exp2$ $exp2$) $\rho$) \\
+    =(if (epxval \rightarrow bool (value-of $exp1$  $\rho$))
+    (value-of $exp2$ $\rho$)
+    (value-of $exp3$ $\rho$))
+
+(value-of (let-exp $var$ $exp1$ $body$) $\rho$) \\
+    = (let ([$val1$ (value-of $exp1$ $\rho$)])
+        (value-of $body$ [$var=val1$] $\rho$)
+    
+
+\end{document}
